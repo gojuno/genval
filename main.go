@@ -48,8 +48,6 @@ func mainLogic(dir string, debug bool, outputFile string) {
 	if err != nil {
 		log.Fatalf("unable to inspect structs for %q: %v", dir, err)
 	}
-	fmt.Println("exitting")
-	return
 
 	gen := generator{
 		Debug:   debug,
@@ -59,7 +57,6 @@ func mainLogic(dir string, debug bool, outputFile string) {
 	if err := gen.generate(dir); err != nil {
 		log.Fatalf("unable to generate validators for %q: %v", dir, err)
 	}
-
 }
 
 type inspector struct {
@@ -159,15 +156,8 @@ func (insp *inspector) visitStruct(astTypeSpec *ast.TypeSpec) {
 
 			fieldType := s.parseFieldType(field.Type)
 			fieldName := s.parseFieldName(field.Names, fieldType)
-			tags := s.parseFieldTags(field.Tag)
+			s.parseTagsAndAddField(fieldName, fieldType, field.Tag)
 
-			s.addField(
-				fieldDef{
-					Name: fieldName,
-					Type: fieldType,
-					Tags: tags,
-				},
-			)
 		}
 		insp.addStruct(s)
 		return
@@ -208,6 +198,10 @@ func (insp *inspector) visitStruct(astTypeSpec *ast.TypeSpec) {
 func (s *structDef) parseFieldType(t ast.Expr) typeDef {
 	switch v := t.(type) {
 	case *ast.Ident:
+		simple := getSimpleType(v.Name)
+		if simple != nil {
+			return simple
+		}
 		return typeStruct{NameStr: v.Name}
 
 	case *ast.SelectorExpr:
@@ -229,18 +223,23 @@ func (s *structDef) parseFieldType(t ast.Expr) typeDef {
 	panic(fmt.Errorf("Undefined typeField for %s: %+v", s.Name, t))
 }
 
-func (s *structDef) addField(f fieldDef) {
-	s.Fields = append(s.Fields, f)
-}
-
 func (s *structDef) parseFieldName(fieldNames []*ast.Ident, fieldType typeDef) string {
 	if len(fieldNames) != 0 {
 		return fieldNames[0].Name
 	}
-	return fieldType.Name() //wrapped struct, fieldName the same as type
+	return fieldType.name() //wrapped struct, fieldName the same as type
 }
 
-func (s *structDef) parseFieldTags(astTag *ast.BasicLit) []tagDef { //example: `json:"place_type,omitempty" validate:"min=1,max=64"` OR `json:"user_id"`
+func (s *structDef) parseTagsAndAddField(fieldName string, fieldType typeDef, astTag *ast.BasicLit) {
+
+	tags := s.parseTags(astTag)
+
+	fieldType.setTags(tags)
+
+	s.Fields = append(s.Fields, fieldDef{Name: fieldName, Type: fieldType})
+}
+
+func (s *structDef) parseTags(astTag *ast.BasicLit) []tagDef { //example: `json:"place_type,omitempty" validate:"min=1,max=64"` OR `json:"user_id"`
 	if astTag == nil {
 		return nil
 	}
@@ -260,7 +259,7 @@ func (s *structDef) parseFieldTags(astTag *ast.BasicLit) []tagDef { //example: `
 			log.Fatalf("invalid tag for %s: %+v: %+v", s.Name, tagString, tagWithName)
 		}
 		tagName := strings.Trim(v[0], " ")
-		if tagName == VALIDATE_TAG {
+		if tagName == ValidateTag {
 			var tags []tagDef
 			functions := v[1][1 : len(v[1])-1] //clean quotes from "min=1,max=64" to min=1,max=64
 			allFunctions := strings.Split(functions, ",")
@@ -270,6 +269,7 @@ func (s *structDef) parseFieldTags(astTag *ast.BasicLit) []tagDef { //example: `
 			}
 			return tags
 		}
+		//TODO: check for misspeling
 	}
 	return nil
 }
@@ -287,4 +287,41 @@ func (s *structDef) parseTagFunc(functionWithParam string) tagDef {
 		}
 	}
 	return tag
+}
+
+func getSimpleType(fieldType string) typeDef {
+	switch fieldType {
+	case "string":
+		return typeMap{}
+
+	case "int":
+		fallthrough
+	case "int8":
+		fallthrough
+	case "int16":
+		fallthrough
+	case "int32":
+		fallthrough
+	case "int64":
+		fallthrough
+	case "uint":
+		fallthrough
+	case "uint8":
+		fallthrough
+	case "uint16":
+		fallthrough
+	case "uint32":
+		fallthrough
+	case "uint64":
+		return &typeNumber{}
+
+	case "float32":
+		fallthrough
+	case "float64":
+		return &typeNumber{}
+
+	case "bool":
+		return &typeBool{}
+	}
+	return nil
 }
