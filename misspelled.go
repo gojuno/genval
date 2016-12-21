@@ -1,6 +1,8 @@
 package main
 
 var misspellValidate = []string{
+	"valid",
+	"validati",
 	"alidate",
 	"vlidate",
 	"vaidate",

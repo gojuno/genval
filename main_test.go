@@ -4,5 +4,5 @@ import "testing"
 
 func TestMain(t *testing.T) {
 
-	mainLogic("examples/api", true, "validators_generated.go")
+	mainLogic("examples/api", "validators_generated.go", true)
 }

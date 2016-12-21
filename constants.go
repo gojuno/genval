@@ -3,14 +3,25 @@ package main
 const ValidateTag = "validate"
 
 const (
-	StringMinLen = "min_len"
-	StringMaxLen = "max_len"
+	StringMinLenKey string = "min_len"
+	StringMaxLenKey string = "max_len"
 
-	NumberMin = "min"
-	NumberMax = "max"
+	NumberMinKey string = "min"
+	NumberMaxKey string = "max"
 
-	ArrayMinItems = "min_items"
-	ArrayMaxItems = "max_items"
+	ArrayMinItemsKey string = "min_items"
+	ArrayMaxItemsKey string = "max_items"
+	ArrayItemKey     string = "item"
 
-	PointerNullable = "nullable"
+	PointerNullableKey string = "nullable"
+	PointerNotNullKey  string = "not_null"
+
+	InterfaceFuncKey string = "func"
+
+	StructMethodKey string = "method"
+
+	MapMinItemsKey string = "min_items"
+	MapMaxItemsKey string = "max_items"
+	MapKeyKey      string = "key"
+	MapValueKey    string = "value"
 )
