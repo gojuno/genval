@@ -28,7 +28,7 @@ func (t ScopeTag) Key() string {
 	return t.Name
 }
 
-func (fd *fieldDef) parseTags(astTag *ast.BasicLit) []Tag { //example: `json:"place_type,omitempty" validate:"min=1,max=64"` OR `json:"user_id"`
+func ParseTags(astTag *ast.BasicLit, logCtx string) []Tag { //example: `json:"place_type,omitempty" validate:"min=1,max=64"` OR `json:"user_id"`
 	if astTag == nil {
 		return nil
 	}
@@ -38,24 +38,21 @@ func (fd *fieldDef) parseTags(astTag *ast.BasicLit) []Tag { //example: `json:"pl
 	}
 	tagString = removeQuotes(tagString) //clean from `json:"place_type,omitempty" validate:"min=1,max=64"` to  json:"place_type,omitempty" validate:"min=1,max=64"
 	splittedTags := strings.Split(tagString, " ")
-
 	for _, tagWithName := range splittedTags {
 		if tagWithName == "" {
 			continue
 		}
 		v := strings.SplitN(tagWithName, ":", 2)
 		if len(v) != 2 {
-			log.Fatalf("invalid tag for type %s, field %s: %s", fd.StructName, fd.Name, tagWithName)
+			log.Fatalf("invalid tag for %s: %s", logCtx, tagWithName)
 		}
 		tagName := strings.Trim(v[0], " ")
 		if tagName == ValidateTag {
-			functions := removeQuotes(v[1]) //clean quotes from "min=1,max=64" to min=1,max=64
-
-			return fd.parseFuncs(functions)
+			return parseFuncs(removeQuotes(v[1]), logCtx) //clean quotes from "min=1,max=64" to min=1,max=64
 		}
 		for _, m := range misspellValidate {
 			if m == tagName {
-				log.Fatalf("tag validate is misspelled: %s", tagName)
+				log.Fatalf("tag validate is misspelled for %s: %s", logCtx, tagName)
 			}
 		}
 	}
@@ -66,7 +63,7 @@ func scopeWasParsedRight(tagFunc string) bool {
 	return strings.Count(tagFunc, "[") == strings.Count(tagFunc, "]")
 }
 
-func (fd *fieldDef) parseFuncs(functions string) []Tag { //min_items=5,key=[min=4,max=59],value=[min_len=1,max_len=64]
+func parseFuncs(functions string, logCtx string) []Tag { //min_items=5,key=[min=4,max=59],value=[min_len=1,max_len=64]
 	var funcs []string
 	cur := ""
 	for _, f := range strings.Split(functions, ",") {
@@ -79,11 +76,9 @@ func (fd *fieldDef) parseFuncs(functions string) []Tag { //min_items=5,key=[min=
 		}
 	}
 	if cur != "" {
-		log.Fatalf("parse funcs failed for type %s, field %s, tag %s", fd.StructName, fd.Name, functions)
+		log.Fatalf("parse funcs failed for %s, tag: %s", logCtx, functions)
 	}
-
 	var res []Tag
-
 	for _, funcWithParam := range funcs {
 		tv := strings.SplitN(funcWithParam, "=", 2)
 		name := strings.Trim(tv[0], " ")
@@ -91,11 +86,10 @@ func (fd *fieldDef) parseFuncs(functions string) []Tag { //min_items=5,key=[min=
 		if len(tv) > 1 {
 			param = strings.Trim(tv[1], " ")
 		}
-
 		if strings.HasPrefix(param, "[") {
 			res = append(res, ScopeTag{
 				Name:      name,
-				InnerTags: fd.parseFuncs(removeQuotes(param)), //remove '[' and ']'
+				InnerTags: parseFuncs(removeQuotes(param), logCtx), //remove '[' and ']'
 			})
 		} else {
 			res = append(res, SimpleTag{

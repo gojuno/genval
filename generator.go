@@ -13,21 +13,14 @@ import (
 )
 
 type generator struct {
-	Structs          []structDef
-	PublicValidators map[string]bool
-	Imports          map[string]bool
+	structs []StructDef
+	imports map[string]bool
 }
 
-type GenConfig struct {
-	NeedValidatableCheck bool
-	AddImport            func(string)
-}
-
-func NewGenerator(structs []structDef, publicValidators map[string]bool) generator {
+func NewGenerator(structs []StructDef) generator {
 	return generator{
-		Structs:          structs,
-		PublicValidators: publicValidators,
-		Imports:          make(map[string]bool),
+		structs: structs,
+		imports: make(map[string]bool),
 	}
 }
 
@@ -40,7 +33,7 @@ func (g generator) Generate(path, outputFile string, needCheck bool) error {
 	cfg := GenConfig{
 		NeedValidatableCheck: needCheck,
 		AddImport: func(imp string) {
-			g.Imports[imp] = true
+			g.imports[imp] = true
 		},
 	}
 
@@ -51,7 +44,7 @@ func (g generator) Generate(path, outputFile string, needCheck bool) error {
 
 	formatted, err := format.Source(buf.Bytes())
 	if err != nil {
-		log.Fatalf("can't format resulting source: %s\n%s", err, buf.String())
+		log.Fatalf("source: %s\ncan't format resulting source: %s", buf.String(), err)
 	}
 
 	filepath := filepath.Join(path, outputFile)
@@ -80,27 +73,25 @@ func (g generator) gen(pkg string, cfg GenConfig) (*bytes.Buffer, error) {
 }
 
 func (g generator) genCode(w io.Writer, cfg GenConfig) {
-
-	for _, s := range sorted(g.Structs) {
-		fmt.Fprintf(w, "func (r %s) validate() error {\n", s.Name)
-
-		s.GenerateBody(w, cfg)
-
-		fmt.Fprintf(w, "\treturn nil\n")
+	varName := "r"
+	for _, s := range sorted(g.structs) {
+		fmt.Fprintf(w, "func (%s %s) validate() error {\n", varName, s.Name)
+		s.GenerateBody(w, cfg, varName)
+		fmt.Fprintf(w, "	return nil\n")
 		fmt.Fprintf(w, "}\n\n")
-		if !g.PublicValidators[s.Name] {
+		if !s.PublicValidatorExist {
 			fmt.Fprintf(w, "func (r %s) Validate() error {\n", s.Name)
-			fmt.Fprintf(w, "\treturn r.validate()")
+			fmt.Fprintf(w, "	return r.validate()")
 			fmt.Fprintf(w, "}\n\n")
 		}
 	}
 }
-func sorted(structs []structDef) []structDef {
+func sorted(structs []StructDef) []StructDef {
 	sort.Sort(AlpabetSorter(structs))
 	return structs
 }
 
-type AlpabetSorter []structDef
+type AlpabetSorter []StructDef
 
 func (a AlpabetSorter) Len() int           { return len(a) }
 func (a AlpabetSorter) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
@@ -141,7 +132,7 @@ func (g generator) genImports(w io.Writer, pkg string, needValidatable bool) {
 	}
 
 	p := params{
-		Imports:         g.Imports,
+		Imports:         g.imports,
 		Pkg:             pkg,
 		NeedValidatable: needValidatable,
 	}

@@ -11,9 +11,10 @@ type User struct {
 	DogOptional   Dog      `validate:"method=ValidateOptional"`
 	Urls          []string `validate:"min_items=1,item=[min_len=5,max_len=256]"`
 	Cats          []*Dog   `validate:"min_items=1,item=[nullable]"`
-	Dogs          *[]int   `validate:"nullable,min_items=1,item=[min=4]"`
+	Test          *[]int   `validate:"nullable,min_items=1,item=[min=4]"`
 	Flag          bool
 	Some          interface{}    `validate:"func=validateSome"`
+	SomeArray     []interface{}  `validate:"min_items=1,item=[func=validateSome]"`
 	Dict          map[string]int `validate:"min_items=2,key=[max_len=64],value=[min=-35,max=34]"`
 	DictDogs      map[string]Dog `validate:"value=[method=ValidateOptional]"`
 }
@@ -30,7 +31,6 @@ func (Dog) ValidateOptional() error {
 }
 
 //aliases
-//maps
 //maps on maps
 //invalid tags
 //misspelled tags

@@ -5,12 +5,17 @@ import (
 	"io"
 )
 
-func NewTypeStruct() *typeStruct {
-	return &typeStruct{}
+func NewStructType(typeName string) *typeStruct {
+	return &typeStruct{typeName: typeName}
 }
 
 type typeStruct struct {
-	Method *string
+	typeName string
+	Method   *string
+}
+
+func (t typeStruct) Type() string {
+	return t.typeName
 }
 
 func (t *typeStruct) SetTag(tag Tag) error {
@@ -24,19 +29,23 @@ func (t *typeStruct) SetTag(tag Tag) error {
 	return nil
 }
 
-func (t typeStruct) Generate(w io.Writer, cfg GenConfig, suffix, name string) {
+func (t typeStruct) Generate(w io.Writer, cfg GenConfig, name Name) {
 	switch {
 	case t.Method != nil:
-		fmt.Fprintf(w, "if err := %s.%s(); err != nil {\n", suffix+name, *t.Method)
+		fmt.Fprintf(w, "if err := %s.%s(); err != nil {\n", name.WithoutPointer(), *t.Method)
 		fmt.Fprintf(w, "    return err\n")
 		fmt.Fprintf(w, "}\n")
 	case cfg.NeedValidatableCheck:
-		fmt.Fprintf(w, "if err := callValidateIfValidatable(%s); err != nil {\n", suffix+name)
+		fmt.Fprintf(w, "if err := callValidateIfValidatable(%s); err != nil {\n", name.WithoutPointer())
 		fmt.Fprintf(w, "    return err\n")
 		fmt.Fprintf(w, "}\n")
 	default:
-		fmt.Fprintf(w, "if err := %s.Validate(); err != nil {\n", suffix+name)
+		fmt.Fprintf(w, "if err := %s.Validate(); err != nil {\n", name.WithoutPointer())
 		fmt.Fprintf(w, "    return err\n")
 		fmt.Fprintf(w, "}\n")
 	}
+}
+
+func (t typeStruct) Validate() error {
+	return nil
 }

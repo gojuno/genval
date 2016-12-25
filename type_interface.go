@@ -5,12 +5,16 @@ import (
 	"io"
 )
 
-func NewTypeInterface() *typeInterface {
+func NewInterfaceType() *typeInterface {
 	return &typeInterface{}
 }
 
 type typeInterface struct {
 	Func *string
+}
+
+func (t typeInterface) Type() string {
+	return "interface"
 }
 
 func (t *typeInterface) SetTag(tag Tag) error {
@@ -24,10 +28,14 @@ func (t *typeInterface) SetTag(tag Tag) error {
 	return nil
 }
 
-func (t typeInterface) Generate(w io.Writer, cfg GenConfig, suffix, name string) {
+func (t typeInterface) Generate(w io.Writer, cfg GenConfig, name Name) {
 	if t.Func != nil {
-		fmt.Fprintf(w, "if err:=%s(%s); err!=nil {\n", *t.Func, suffix+name)
+		fmt.Fprintf(w, "if err:=%s(%s); err!=nil {\n", *t.Func, name.Full())
 		fmt.Fprintf(w, "    return err\n")
 		fmt.Fprintf(w, "}\n")
 	}
+}
+
+func (t typeInterface) Validate() error {
+	return nil
 }

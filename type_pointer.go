@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-func NewTypePointer(inner TypeDef) *typePointer {
+func NewPointerType(inner TypeDef) *typePointer {
 	return &typePointer{
 		Nullable:  false,
 		InnerType: inner,
@@ -15,6 +15,10 @@ func NewTypePointer(inner TypeDef) *typePointer {
 type typePointer struct {
 	Nullable  bool
 	InnerType TypeDef
+}
+
+func (t typePointer) Type() string {
+	return t.InnerType.Type()
 }
 
 func (t *typePointer) SetTag(tag Tag) error {
@@ -29,17 +33,20 @@ func (t *typePointer) SetTag(tag Tag) error {
 	return nil
 }
 
-func (t typePointer) Generate(w io.Writer, cfg GenConfig, suffix, name string) {
-
+func (t typePointer) Generate(w io.Writer, cfg GenConfig, name Name) {
 	if t.Nullable {
-		fmt.Fprintf(w, "if %s != nil {\n", suffix+name)
-		t.InnerType.Generate(w, cfg, "*"+suffix, name)
+		fmt.Fprintf(w, "if %s != nil {\n", name.Full())
+		t.InnerType.Generate(w, cfg, name.WithPointer())
 		fmt.Fprintf(w, "}\n")
 	} else {
 		cfg.AddImport("fmt")
-		fmt.Fprintf(w, "if %s == nil {\n", suffix+name)
-		fmt.Fprintf(w, "	return fmt.Errorf(\"field %s is required, should not be nil\" )\n", name)
+		fmt.Fprintf(w, "if %s == nil {\n", name.Full())
+		fmt.Fprintf(w, "	return fmt.Errorf(\"field %s is required, should not be nil\" )\n", name.FieldName())
 		fmt.Fprintf(w, "}\n")
-		t.InnerType.Generate(w, cfg, "*"+suffix, name)
+		t.InnerType.Generate(w, cfg, name.WithPointer())
 	}
+}
+
+func (t typePointer) Validate() error {
+	return nil
 }

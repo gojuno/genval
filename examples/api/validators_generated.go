@@ -10,24 +10,27 @@ import (
 	"unicode/utf8"
 )
 
-type Validatable interface {
-	Validate() error
-}
-
-func callValidateIfValidatable(i interface{}) error {
-	if v, ok := i.(Validatable); ok {
-		if err := v.Validate(); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 func (r Dog) validate() error {
 	return nil
 }
 
 func (r Dog) Validate() error {
+	return r.validate()
+}
+
+func (r Status) validate() error {
+	switch r {
+	case StatusCreated:
+	case StatusPending:
+	case StatusActive:
+	case StatusFailed:
+	default:
+		return fmt.Errorf("invalid value for enum Status: %v", r)
+	}
+	return nil
+}
+
+func (r Status) Validate() error {
 	return r.validate()
 }
 
@@ -67,13 +70,13 @@ func (r User) validate() error {
 	if r.Float > 42.55 {
 		return fmt.Errorf("field Float is more than 42.55 ")
 	}
-	if err := callValidateIfValidatable(r.Dog); err != nil {
+	if err := r.Dog.Validate(); err != nil {
 		return err
 	}
 	if r.DogPointer == nil {
 		return fmt.Errorf("field DogPointer is required, should not be nil")
 	}
-	if err := callValidateIfValidatable(*r.DogPointer); err != nil {
+	if err := r.DogPointer.Validate(); err != nil {
 		return err
 	}
 	if err := r.DogOptional.ValidateOptional(); err != nil {
@@ -97,16 +100,16 @@ func (r User) validate() error {
 	for _, x := range r.Cats {
 		_ = x
 		if x != nil {
-			if err := callValidateIfValidatable(*x); err != nil {
+			if err := x.Validate(); err != nil {
 				return err
 			}
 		}
 	}
-	if r.Dogs != nil {
-		if len(*r.Dogs) < 1 {
-			return fmt.Errorf("array Dogs has less items than 1 ")
+	if r.Test != nil {
+		if len(*r.Test) < 1 {
+			return fmt.Errorf("array Test has less items than 1 ")
 		}
-		for _, x := range *r.Dogs {
+		for _, x := range *r.Test {
 			_ = x
 			if x < 4 {
 				return fmt.Errorf("field x is less than 4 ")
@@ -115,6 +118,15 @@ func (r User) validate() error {
 	}
 	if err := validateSome(r.Some); err != nil {
 		return err
+	}
+	if len(r.SomeArray) < 1 {
+		return fmt.Errorf("array SomeArray has less items than 1 ")
+	}
+	for _, x := range r.SomeArray {
+		_ = x
+		if err := validateSome(x); err != nil {
+			return err
+		}
 	}
 	if len(r.Dict) < 2 {
 		return fmt.Errorf("map Dict has less items than 2 ")
