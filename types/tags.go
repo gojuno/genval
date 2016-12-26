@@ -1,16 +1,34 @@
-package main
+package types
 
 import (
 	"go/ast"
 	"log"
 	"strings"
-
-	"github.com/l1va/genval/types"
 )
 
-const ValidateTag = "validate"
+type Tag interface {
+	Key() string
+}
 
-func ParseTags(astTag *ast.BasicLit, logCtx string) []types.Tag { //example: `json:"place_type,omitempty" validate:"min=1,max=64"` OR `json:"user_id"`
+type SimpleTag struct {
+	Name  string
+	Param string
+}
+
+func (t SimpleTag) Key() string {
+	return t.Name
+}
+
+type ScopeTag struct {
+	Name      string
+	InnerTags []Tag
+}
+
+func (t ScopeTag) Key() string {
+	return t.Name
+}
+
+func ParseTags(astTag *ast.BasicLit, logCtx string) []Tag { //example: `json:"place_type,omitempty" validate:"min=1,max=64"` OR `json:"user_id"`
 	if astTag == nil {
 		return nil
 	}
@@ -45,7 +63,7 @@ func scopeWasParsedRight(tagFunc string) bool {
 	return strings.Count(tagFunc, "[") == strings.Count(tagFunc, "]")
 }
 
-func parseFuncs(functions string, logCtx string) []types.Tag { //min_items=5,key=[min=4,max=59],value=[min_len=1,max_len=64]
+func parseFuncs(functions string, logCtx string) []Tag { //min_items=5,key=[min=4,max=59],value=[min_len=1,max_len=64]
 	var funcs []string
 	cur := ""
 	for _, f := range strings.Split(functions, ",") {
@@ -60,7 +78,7 @@ func parseFuncs(functions string, logCtx string) []types.Tag { //min_items=5,key
 	if cur != "" {
 		log.Fatalf("parse funcs failed for %s, tag: %s", logCtx, functions)
 	}
-	var res []types.Tag
+	var res []Tag
 	for _, funcWithParam := range funcs {
 		tv := strings.SplitN(funcWithParam, "=", 2)
 		name := strings.Trim(tv[0], " ")
@@ -69,12 +87,12 @@ func parseFuncs(functions string, logCtx string) []types.Tag { //min_items=5,key
 			param = strings.Trim(tv[1], " ")
 		}
 		if strings.HasPrefix(param, "[") {
-			res = append(res, types.ScopeTag{
+			res = append(res, ScopeTag{
 				Name:      name,
 				InnerTags: parseFuncs(removeQuotes(param), logCtx), //remove '[' and ']'
 			})
 		} else {
-			res = append(res, types.SimpleTag{
+			res = append(res, SimpleTag{
 				Name:  name,
 				Param: param,
 			})

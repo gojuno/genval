@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-func NewInterfaceType() *typeInterface {
+func NewInterface() *typeInterface {
 	return &typeInterface{}
 }
 

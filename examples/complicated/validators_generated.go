@@ -2,7 +2,7 @@
 //Please don't modify it manually. Edit your entity tags and then
 //run go generate
 
-package api
+package complicated
 
 import (
 	"fmt"
@@ -10,12 +10,70 @@ import (
 	"unicode/utf8"
 )
 
+type Validatable interface {
+	Validate() error
+}
+
+func callValidateIfValidatable(i interface{}) error {
+	if v, ok := i.(Validatable); ok {
+		if err := v.Validate(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (r AliasOnDogsMapAlias) validate() error {
+	if err := callValidateIfValidatable(r); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r AliasOnDogsMapAlias) Validate() error {
+	return r.validate()
+}
+
 func (r Dog) validate() error {
+	if utf8.RuneCountInString(r.Name) < 1 {
+		return fmt.Errorf("field Name is less than 1 ")
+	}
+	if utf8.RuneCountInString(r.Name) > 64 {
+		return fmt.Errorf("field Name is more than 64 ")
+	}
 	return nil
 }
 
 func (r Dog) Validate() error {
 	return r.validate()
+}
+
+func (r DogsMapAlias) validate() error {
+	for k, v := range r {
+		_ = k
+		_ = v
+		if utf8.RuneCountInString(k) < 1 {
+			return fmt.Errorf("field k is less than 1 ")
+		}
+		if err := callValidateIfValidatable(v); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (r DogsMapAlias) Validate() error {
+	return r.validate()
+}
+
+func (r State) validate() error {
+	switch r {
+	case StateOk:
+	case StateError:
+	default:
+		return fmt.Errorf("invalid value for enum State: %v", r)
+	}
+	return nil
 }
 
 func (r Status) validate() error {
@@ -70,13 +128,13 @@ func (r User) validate() error {
 	if r.Float > 42.55 {
 		return fmt.Errorf("field Float is more than 42.55 ")
 	}
-	if err := r.Dog.Validate(); err != nil {
+	if err := callValidateIfValidatable(r.Dog); err != nil {
 		return err
 	}
 	if r.DogPointer == nil {
 		return fmt.Errorf("field DogPointer is required, should not be nil")
 	}
-	if err := r.DogPointer.Validate(); err != nil {
+	if err := callValidateIfValidatable(r.DogPointer); err != nil {
 		return err
 	}
 	if err := r.DogOptional.ValidateOptional(); err != nil {
@@ -87,20 +145,20 @@ func (r User) validate() error {
 	}
 	for _, x := range r.Urls {
 		_ = x
-		if utf8.RuneCountInString(x) < 5 {
-			return fmt.Errorf("field x is less than 5 ")
+		if utf8.RuneCountInString(x) < 1 {
+			return fmt.Errorf("field x is less than 1 ")
 		}
 		if utf8.RuneCountInString(x) > 256 {
 			return fmt.Errorf("field x is more than 256 ")
 		}
 	}
-	if len(r.Cats) < 1 {
-		return fmt.Errorf("array Cats has less items than 1 ")
+	if len(r.Dogs) < 1 {
+		return fmt.Errorf("array Dogs has less items than 1 ")
 	}
-	for _, x := range r.Cats {
+	for _, x := range r.Dogs {
 		_ = x
 		if x != nil {
-			if err := x.Validate(); err != nil {
+			if err := callValidateIfValidatable(x); err != nil {
 				return err
 			}
 		}
@@ -155,6 +213,29 @@ func (r User) validate() error {
 		}
 		if err := v.ValidateOptional(); err != nil {
 			return err
+		}
+	}
+	if err := callValidateIfValidatable(r.Alias); err != nil {
+		return err
+	}
+	if err := callValidateIfValidatable(r.AliasOnAlias); err != nil {
+		return err
+	}
+	for k, v := range r.MapOfMap {
+		_ = k
+		_ = v
+		if utf8.RuneCountInString(k) < 1 {
+			return fmt.Errorf("field k is less than 1 ")
+		}
+		if len(v) < 1 {
+			return fmt.Errorf("map v has less items than 1 ")
+		}
+		for k, v := range v {
+			_ = k
+			_ = v
+			if utf8.RuneCountInString(v) < 3 {
+				return fmt.Errorf("field v is less than 3 ")
+			}
 		}
 	}
 	return nil

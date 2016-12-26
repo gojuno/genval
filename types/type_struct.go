@@ -5,13 +5,14 @@ import (
 	"io"
 )
 
-func NewStructType(typeName string) *typeStruct {
+func NewStruct(typeName string) *typeStruct {
 	return &typeStruct{typeName: typeName}
 }
 
 type typeStruct struct {
 	typeName string
 	Method   *string
+	Func     *string
 }
 
 func (t typeStruct) Type() string {
@@ -23,6 +24,9 @@ func (t *typeStruct) SetTag(tag Tag) error {
 	case StructMethodKey:
 		st := tag.(SimpleTag)
 		t.Method = &st.Param
+	case StructFuncKey:
+		st := tag.(SimpleTag)
+		t.Func = &st.Param
 	default:
 		return ErrUnusedTag
 	}
@@ -33,6 +37,10 @@ func (t typeStruct) Generate(w io.Writer, cfg GenConfig, name Name) {
 	switch {
 	case t.Method != nil:
 		fmt.Fprintf(w, "if err := %s.%s(); err != nil {\n", name.WithoutPointer(), *t.Method)
+		fmt.Fprintf(w, "    return err\n")
+		fmt.Fprintf(w, "}\n")
+	case t.Func != nil:
+		fmt.Fprintf(w, "if err := %s(%s); err != nil {\n", *t.Func, name.Full())
 		fmt.Fprintf(w, "    return err\n")
 		fmt.Fprintf(w, "}\n")
 	case cfg.NeedValidatableCheck:
@@ -47,5 +55,8 @@ func (t typeStruct) Generate(w io.Writer, cfg GenConfig, name Name) {
 }
 
 func (t typeStruct) Validate() error {
+	if t.Func != nil && t.Method != nil {
+		return fmt.Errorf("could not use func and method at the same time")
+	}
 	return nil
 }

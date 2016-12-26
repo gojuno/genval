@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-func NewPointerType(inner TypeDef) *typePointer {
+func NewPointer(inner TypeDef) *typePointer {
 	return &typePointer{
 		Nullable:  false,
 		InnerType: inner,
@@ -48,5 +48,5 @@ func (t typePointer) Generate(w io.Writer, cfg GenConfig, name Name) {
 }
 
 func (t typePointer) Validate() error {
-	return nil
+	return t.InnerType.Validate()
 }

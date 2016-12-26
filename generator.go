@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"go/format"
 	"html/template"
 	"io"
@@ -75,17 +74,8 @@ func (g generator) gen(pkg string, cfg types.GenConfig) (*bytes.Buffer, error) {
 }
 
 func (g generator) genCode(w io.Writer, cfg types.GenConfig) {
-	varName := "r"
 	for _, s := range sorted(g.structs) {
-		fmt.Fprintf(w, "func (%s %s) validate() error {\n", varName, s.Name)
-		s.GenerateBody(w, cfg, varName)
-		fmt.Fprintf(w, "	return nil\n")
-		fmt.Fprintf(w, "}\n\n")
-		if !s.PublicValidatorExist {
-			fmt.Fprintf(w, "func (r %s) Validate() error {\n", s.Name)
-			fmt.Fprintf(w, "	return r.validate()")
-			fmt.Fprintf(w, "}\n\n")
-		}
+		s.Generate(w, cfg)
 	}
 }
 func sorted(structs []StructDef) []StructDef {

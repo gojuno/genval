@@ -2,7 +2,7 @@ package types
 
 import "io"
 
-func NewFuncType() *typeFunc {
+func NewFunc() *typeFunc {
 	return &typeFunc{}
 }
 

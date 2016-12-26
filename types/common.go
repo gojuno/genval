@@ -59,28 +59,6 @@ func (n Name) WithPointer() Name {
 	}
 }
 
-type Tag interface {
-	Key() string
-}
-
-type SimpleTag struct {
-	Name  string
-	Param string
-}
-
-func (t SimpleTag) Key() string {
-	return t.Name
-}
-
-type ScopeTag struct {
-	Name      string
-	InnerTags []Tag
-}
-
-func (t ScopeTag) Key() string {
-	return t.Name
-}
-
 func validateMinMax(minStr, maxStr *string, minValidate, maxValidate func(float64) error) error {
 	var min, max float64
 	if minStr != nil {

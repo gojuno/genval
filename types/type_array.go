@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-func NewArrayType(inner TypeDef) *typeArray {
+func NewArray(inner TypeDef) *typeArray {
 	return &typeArray{InnerType: inner}
 }
 
@@ -62,7 +62,7 @@ func (t typeArray) Generate(w io.Writer, cfg GenConfig, name Name) {
 }
 
 func (t typeArray) Validate() error {
-	return validateMinMax(
+	if err := validateMinMax(
 		t.Min,
 		t.Max,
 		func(min float64) error {
@@ -77,5 +77,8 @@ func (t typeArray) Validate() error {
 			}
 			return nil
 		},
-	)
+	); err != nil {
+		return err
+	}
+	return t.InnerType.Validate()
 }

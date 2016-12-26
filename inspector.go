@@ -48,18 +48,7 @@ func (insp *inspector) Result() []StructDef {
 		}
 		if v, ok := insp.enums[s.Name]; ok {
 			res[i].EnumValues = v
-			insp.enums[s.Name] = nil //mark as used
 		}
-	}
-	for k, v := range insp.enums {
-		s := StructDef{
-			Name:       k,
-			EnumValues: v,
-		}
-		if p, ok := insp.publicValidators[s.Name]; ok {
-			s.PublicValidatorExist = p
-		}
-		res = append(res, s)
 	}
 	return res
 }
@@ -89,12 +78,12 @@ func (insp *inspector) Visit(node ast.Node) ast.Visitor {
 		return nil
 	case *ast.FuncDecl: //To check if Validate() method already exist
 		methodName := spec.Name.Name
-		if methodName == "Validate" {
+		if methodName == "Validate" && spec.Recv != nil {
 			st := spec.Recv.List[0].Type
-			if star, ok := st.(*ast.StarExpr); ok {
-				if x, ok := star.X.(*ast.Ident); ok {
-					insp.publicValidators[x.Name] = true
-				}
+			if x, ok := st.(*ast.Ident); ok {
+				insp.publicValidators[x.Name] = true
+			} else {
+				log.Fatalf("method Validate should be like: func (s Struct)Validate() error{...}")
 			}
 		}
 		return nil
@@ -103,8 +92,7 @@ func (insp *inspector) Visit(node ast.Node) ast.Visitor {
 			valueName := spec.Names[0].Name
 			if x, ok := spec.Type.(*ast.Ident); ok {
 				valueType := x.Name
-				isSimple := nil != getSimpleType(valueType)
-				if !isSimple {
+				if !isSimple(valueType) {
 					insp.enums[valueType] = append(insp.enums[valueType], valueName)
 				}
 			}
@@ -123,26 +111,23 @@ func (insp *inspector) visitStruct(astTypeSpec *ast.TypeSpec) {
 	switch v := astTypeSpec.Type.(type) {
 	case *ast.StructType:
 		astFields := v.Fields.List
-		s := NewStruct(structName)
+		s := NewFieldsStruct(structName)
 		for _, astField := range astFields {
 			fieldType := parseFieldType(astField.Type, fmt.Sprintf("struct %s", structName))
 			fieldName := parseFieldName(astField.Names, fieldType)
-			tags := ParseTags(astField.Tag, fmt.Sprintf("struct %s, field %s", structName, fieldName))
+			tags := types.ParseTags(astField.Tag, fmt.Sprintf("struct %s, field %s", structName, fieldName))
 
 			field, err := NewField(fieldName, fieldType, tags)
 			if err != nil {
-				log.Fatalf("field creatinon failed for struct %s, %s", structName, err)
+				log.Fatalf("field creation failed for struct %s, %s", structName, err)
 			}
 			s.AddField(*field)
 		}
 		insp.addStruct(s)
 		return
-	case *ast.Ident: //alias on simple type
-	case *ast.SelectorExpr: //alias on struct
-	case *ast.StarExpr: //alias on pointer
-	case *ast.MapType: //alias on map
-	case *ast.InterfaceType: //alias on interface
-	case *ast.ArrayType: //alias on array
+	case *ast.Ident, *ast.SelectorExpr, *ast.StarExpr, *ast.MapType, *ast.InterfaceType, *ast.ArrayType: //aliases
+		aliasType := parseFieldType(v, fmt.Sprintf("struct %s", structName))
+		insp.addStruct(NewAliasStruct(structName, aliasType))
 	default:
 		log.Fatalf("not expected Type for typeSpec: %s, %+v: %T", structName, astTypeSpec, astTypeSpec.Type)
 	}
@@ -155,20 +140,20 @@ func parseFieldType(t ast.Expr, logCtx string) types.TypeDef {
 		if simple != nil {
 			return simple
 		}
-		return types.NewStructType(v.Name)
+		return types.NewStruct(v.Name)
 	case *ast.SelectorExpr:
 		// v.X - contains pkg : if x, ok := v.X.(*ast.Ident); ok { x.Name+"."+v.Sel.Name)}
-		return types.NewStructType(v.Sel.Name)
+		return types.NewStruct(v.Sel.Name)
 	case *ast.ArrayType:
-		return types.NewArrayType(parseFieldType(v.Elt, logCtx))
+		return types.NewArray(parseFieldType(v.Elt, logCtx))
 	case *ast.StarExpr:
-		return types.NewPointerType(parseFieldType(v.X, logCtx))
+		return types.NewPointer(parseFieldType(v.X, logCtx))
 	case *ast.InterfaceType:
-		return types.NewInterfaceType()
+		return types.NewInterface()
 	case *ast.MapType:
-		return types.NewMapType(parseFieldType(v.Key, logCtx), parseFieldType(v.Value, logCtx))
+		return types.NewMap(parseFieldType(v.Key, logCtx), parseFieldType(v.Value, logCtx))
 	case *ast.FuncType:
-		return types.NewFuncType()
+		return types.NewFunc()
 	}
 	log.Fatalf("undefined typeField for %s: %+v, %T", logCtx, t, t)
 	return nil
@@ -181,16 +166,20 @@ func parseFieldName(fieldNames []*ast.Ident, fieldType types.TypeDef) string {
 	return fieldType.Type() //wrapped struct, fieldName the same as type
 }
 
+func isSimple(fieldType string) bool {
+	return getSimpleType(fieldType) != nil
+}
+
 func getSimpleType(fieldType string) types.TypeDef {
 	switch fieldType {
 	case "string":
-		return types.NewStringType()
+		return types.NewString()
 	case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64":
-		return types.NewNumberType(fieldType)
+		return types.NewNumber(fieldType)
 	case "float32", "float64":
-		return types.NewNumberType(fieldType)
+		return types.NewNumber(fieldType)
 	case "bool":
-		return types.NewBoolType()
+		return types.NewBool()
 	}
 	return nil
 }

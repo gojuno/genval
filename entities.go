@@ -9,26 +9,43 @@ import (
 
 type StructDef struct {
 	Name                 string
-	Fields               []FieldDef
 	PublicValidatorExist bool
 	EnumValues           []string
+	fields               []FieldDef
+	aliasType            *types.TypeDef
 }
 
-func NewStruct(name string) StructDef {
+func NewFieldsStruct(name string) StructDef {
 	return StructDef{Name: name}
+}
+func NewAliasStruct(name string, aliasType types.TypeDef) StructDef {
+	return StructDef{Name: name, aliasType: &aliasType}
 }
 
 func (s *StructDef) AddField(f FieldDef) {
-	s.Fields = append(s.Fields, f)
+	s.fields = append(s.fields, f)
 }
 
-func (s StructDef) GenerateBody(w io.Writer, cfg types.GenConfig, varName string) {
-	if len(s.EnumValues) > 0 {
+func (s StructDef) Generate(w io.Writer, cfg types.GenConfig) {
+	varName := "r"
+	fmt.Fprintf(w, "func (%s %s) validate() error {\n", varName, s.Name)
+	switch {
+	case len(s.EnumValues) > 0:
 		s.generateEnumValidator(w, cfg, varName)
-		return
+	case s.aliasType != nil:
+		aliasType := *s.aliasType
+		aliasType.Generate(w, cfg, types.NewSimpleName(varName))
+	default:
+		for _, field := range s.fields {
+			field.fieldType.Generate(w, cfg, types.NewName("", varName+".", field.fieldName))
+		}
 	}
-	for _, field := range s.Fields {
-		field.fieldType.Generate(w, cfg, types.NewName("", varName+".", field.fieldName))
+	fmt.Fprintf(w, "	return nil\n")
+	fmt.Fprintf(w, "}\n\n")
+	if !s.PublicValidatorExist {
+		fmt.Fprintf(w, "func (r %s) Validate() error {\n", s.Name)
+		fmt.Fprintf(w, "	return r.validate()")
+		fmt.Fprintf(w, "}\n\n")
 	}
 }
 

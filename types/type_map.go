@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-func NewMapType(key, value TypeDef) *typeMap {
+func NewMap(key, value TypeDef) *typeMap {
 	return &typeMap{Key: key, Value: value}
 }
 
@@ -72,7 +72,7 @@ func (t typeMap) Generate(w io.Writer, cfg GenConfig, name Name) {
 }
 
 func (t typeMap) Validate() error {
-	return validateMinMax(
+	if err := validateMinMax(
 		t.Min,
 		t.Max,
 		func(min float64) error {
@@ -87,5 +87,11 @@ func (t typeMap) Validate() error {
 			}
 			return nil
 		},
-	)
+	); err != nil {
+		return err
+	}
+	if err := t.Key.Validate(); err != nil {
+		return err
+	}
+	return t.Value.Validate()
 }

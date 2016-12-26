@@ -1,4 +1,4 @@
-package api
+package complicated
 
 type User struct {
 	Name          string  `validate:"min_len=3,max_len=64"`
@@ -9,14 +9,17 @@ type User struct {
 	Dog           Dog
 	DogPointer    *Dog
 	DogOptional   Dog      `validate:"method=ValidateOptional"`
-	Urls          []string `validate:"min_items=1,item=[min_len=5,max_len=256]"`
-	Cats          []*Dog   `validate:"min_items=1,item=[nullable]"`
+	Urls          []string `validate:"min_items=1,item=[max_len=256]"`
+	Dogs          []*Dog   `validate:"min_items=1,item=[nullable]"`
 	Test          *[]int   `validate:"nullable,min_items=1,item=[min=4]"`
 	Flag          bool
 	Some          interface{}    `validate:"func=validateSome"`
 	SomeArray     []interface{}  `validate:"min_items=1,item=[func=validateSome]"`
 	Dict          map[string]int `validate:"min_items=2,key=[max_len=64],value=[min=-35,max=34]"`
 	DictDogs      map[string]Dog `validate:"value=[method=ValidateOptional]"`
+	Alias         DogsMapAlias
+	AliasOnAlias  AliasOnDogsMapAlias
+	MapOfMap      map[string]map[int]string `validate:"value=[min_items=1,value=[min_len=3]]"`
 }
 
 func validateSome(i interface{}) error {
@@ -24,15 +27,13 @@ func validateSome(i interface{}) error {
 }
 
 type Dog struct {
+	Name string `validate:"min_len=1,max_len=64"`
 }
 
 func (Dog) ValidateOptional() error {
-	return nil
+	return nil //len(dog.Name) is not validating here
 }
 
-//aliases
-//maps on maps
-//invalid tags
-//misspelled tags
-//array of array
-//pointer with pointer
+type DogsMapAlias map[string]Dog
+
+type AliasOnDogsMapAlias DogsMapAlias

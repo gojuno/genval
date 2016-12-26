@@ -1,4 +1,4 @@
-package main
+package types
 
 var misspellValidate = []string{
 	"valid",

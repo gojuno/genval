@@ -2,7 +2,7 @@ package types
 
 import "io"
 
-func NewBoolType() *typeBool {
+func NewBool() *typeBool {
 	return &typeBool{}
 }
 

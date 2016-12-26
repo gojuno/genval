@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-func NewNumberType(typeName string) *typeNumber {
+func NewNumber(typeName string) *typeNumber {
 	return &typeNumber{typeName: typeName}
 }
 

@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-func NewStringType() *typeString {
+func NewString() *typeString {
 	defaultMinLen := "1"
 	return &typeString{
 		MinLen: &defaultMinLen,

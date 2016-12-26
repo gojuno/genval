@@ -1,5 +1,7 @@
 package types
 
+const ValidateTag = "validate"
+
 const (
 	StringMinLenKey string = "min_len"
 	StringMaxLenKey string = "max_len"
@@ -17,6 +19,7 @@ const (
 	InterfaceFuncKey string = "func"
 
 	StructMethodKey string = "method"
+	StructFuncKey   string = "func"
 
 	MapMinItemsKey string = "min_items"
 	MapMaxItemsKey string = "max_items"
