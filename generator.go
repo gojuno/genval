@@ -10,6 +10,8 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+
+	"github.com/l1va/genval/types"
 )
 
 type generator struct {
@@ -30,7 +32,7 @@ func (g generator) Generate(path, outputFile string, needCheck bool) error {
 		pkg = "main"
 	}
 
-	cfg := GenConfig{
+	cfg := types.GenConfig{
 		NeedValidatableCheck: needCheck,
 		AddImport: func(imp string) {
 			g.imports[imp] = true
@@ -61,7 +63,7 @@ func (g generator) Generate(path, outputFile string, needCheck bool) error {
 	return nil
 }
 
-func (g generator) gen(pkg string, cfg GenConfig) (*bytes.Buffer, error) {
+func (g generator) gen(pkg string, cfg types.GenConfig) (*bytes.Buffer, error) {
 	codeBuf := bytes.NewBuffer([]byte{})
 	importsBuf := bytes.NewBuffer([]byte{})
 
@@ -72,7 +74,7 @@ func (g generator) gen(pkg string, cfg GenConfig) (*bytes.Buffer, error) {
 	return importsBuf, nil
 }
 
-func (g generator) genCode(w io.Writer, cfg GenConfig) {
+func (g generator) genCode(w io.Writer, cfg types.GenConfig) {
 	varName := "r"
 	for _, s := range sorted(g.structs) {
 		fmt.Fprintf(w, "func (%s %s) validate() error {\n", varName, s.Name)

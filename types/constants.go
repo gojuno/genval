@@ -1,6 +1,4 @@
-package main
-
-const ValidateTag = "validate"
+package types
 
 const (
 	StringMinLenKey string = "min_len"

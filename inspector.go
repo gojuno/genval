@@ -8,6 +8,8 @@ import (
 	"io/ioutil"
 	"log"
 	"strings"
+
+	"github.com/l1va/genval/types"
 )
 
 type inspector struct {
@@ -146,49 +148,49 @@ func (insp *inspector) visitStruct(astTypeSpec *ast.TypeSpec) {
 	}
 }
 
-func parseFieldType(t ast.Expr, logCtx string) TypeDef {
+func parseFieldType(t ast.Expr, logCtx string) types.TypeDef {
 	switch v := t.(type) {
 	case *ast.Ident:
 		simple := getSimpleType(v.Name)
 		if simple != nil {
 			return simple
 		}
-		return NewStructType(v.Name)
+		return types.NewStructType(v.Name)
 	case *ast.SelectorExpr:
 		// v.X - contains pkg : if x, ok := v.X.(*ast.Ident); ok { x.Name+"."+v.Sel.Name)}
-		return NewStructType(v.Sel.Name)
+		return types.NewStructType(v.Sel.Name)
 	case *ast.ArrayType:
-		return NewArrayType(parseFieldType(v.Elt, logCtx))
+		return types.NewArrayType(parseFieldType(v.Elt, logCtx))
 	case *ast.StarExpr:
-		return NewPointerType(parseFieldType(v.X, logCtx))
+		return types.NewPointerType(parseFieldType(v.X, logCtx))
 	case *ast.InterfaceType:
-		return NewInterfaceType()
+		return types.NewInterfaceType()
 	case *ast.MapType:
-		return NewMapType(parseFieldType(v.Key, logCtx), parseFieldType(v.Value, logCtx))
+		return types.NewMapType(parseFieldType(v.Key, logCtx), parseFieldType(v.Value, logCtx))
 	case *ast.FuncType:
-		return NewFuncType()
+		return types.NewFuncType()
 	}
 	log.Fatalf("undefined typeField for %s: %+v, %T", logCtx, t, t)
 	return nil
 }
 
-func parseFieldName(fieldNames []*ast.Ident, fieldType TypeDef) string {
+func parseFieldName(fieldNames []*ast.Ident, fieldType types.TypeDef) string {
 	if len(fieldNames) != 0 {
 		return fieldNames[0].Name
 	}
 	return fieldType.Type() //wrapped struct, fieldName the same as type
 }
 
-func getSimpleType(fieldType string) TypeDef {
+func getSimpleType(fieldType string) types.TypeDef {
 	switch fieldType {
 	case "string":
-		return NewStringType()
+		return types.NewStringType()
 	case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64":
-		return NewNumberType(fieldType)
+		return types.NewNumberType(fieldType)
 	case "float32", "float64":
-		return NewNumberType(fieldType)
+		return types.NewNumberType(fieldType)
 	case "bool":
-		return NewBoolType()
+		return types.NewBoolType()
 	}
 	return nil
 }

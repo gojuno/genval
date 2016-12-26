@@ -1,9 +1,8 @@
-package main
+package types
 
 import (
 	"fmt"
 	"io"
-	"strconv"
 )
 
 func NewNumberType(typeName string) *typeNumber {
@@ -59,35 +58,4 @@ func (t typeNumber) Validate() error {
 			return nil
 		},
 	)
-}
-
-func validateMinMax(minStr, maxStr *string, minValidate, maxValidate func(float64) error) error {
-	var min, max float64
-	if minStr != nil {
-		f, err := strconv.ParseFloat(*minStr, 64)
-		if err != nil {
-			return fmt.Errorf("failed to parse value for min tag: %s", *minStr)
-		}
-		if err := minValidate(f); err != nil {
-			return err
-		}
-		min = f
-	}
-	if maxStr != nil {
-		f, err := strconv.ParseFloat(*maxStr, 64)
-		if err != nil {
-			return fmt.Errorf("failed to parse value for max tag: %s", *maxStr)
-		}
-		if err := maxValidate(f); err != nil {
-			return err
-		}
-		max = f
-	}
-	if minStr != nil && maxStr != nil {
-		if max < min {
-			return fmt.Errorf("max can't be less than min: min=%s, max=%s", *minStr, *maxStr)
-		}
-	}
-	return nil
-
 }
