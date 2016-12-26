@@ -53,6 +53,19 @@ func (r User) validate() error {
 	if err := callValidateIfValidatable(r.Dog); err != nil {
 		return err
 	}
+	if len(r.Emails) < 1 {
+		return fmt.Errorf("map Emails has less items than 1 ")
+	}
+	for k, v := range r.Emails {
+		_ = k
+		_ = v
+		if k > 3 {
+			return fmt.Errorf("field k is more than 3 ")
+		}
+		if utf8.RuneCountInString(v) < 5 {
+			return fmt.Errorf("field v is less than 5 ")
+		}
+	}
 	return nil
 }
 
