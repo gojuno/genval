@@ -29,13 +29,13 @@ Usage and documentation
     Other: empty value (no validation)
 
 ##### Some tips:
-    1. not use interface{} if you can
-    2. try flag needValidatableCheck=false 
-    3. commit generated code under source control
-    4. **read generated code** if needed, do not afraid it
+1. not use interface{} if you can
+2. try flag needValidatableCheck=false 
+3. commit generated code under source control
+4. **read generated code** if needed, do not afraid it
 
 ##### Examples:
-Next code :
+[Generated code](https://github.com/l1va/genval/blob/master/examples/simple/validators_generated.go) for next structs:
 ```go
 type User struct {
     Name string `validate:"min_len=3,max_len=64"`
@@ -47,7 +47,6 @@ type Dog struct {
     Name string `validate:"min_len=1,max_len=64"`
 }
 ```
-will generate : [Generated code](https://github.com/l1va/genval/examples/simple/validators_generated.go)
 
 - [Simple](https://github.com/l1va/genval/tree/master/examples/simple)
 - [Complicated](https://github.com/l1va/genval/tree/master/examples/complicated)
