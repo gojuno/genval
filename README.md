@@ -12,25 +12,25 @@ Installation
 
 Usage and documentation
 ------
-    ./genval packageWithStructsForGeneration 
+    `./genval packageWithStructsForGeneration` 
 or as go:generate directive  
-    //go:generate genval packageWithStructsForGeneration
+    `//go:generate genval packageWithStructsForGeneration`
 
 ##### Additional flags
     outputFile - output file name (default: validators.go)
     needValidatableCheck - check struct on Validatable before calling Validate() (default: true)
 
 ##### Supported tags:
-- String: **min_len**, **max_len** - min and max valid lenghth 
-- Number: **min**, **max** - min and max valid value (can be float)
-- Array:  **min_items**, **max_items** - min and max count of items in array  
+- *String*: **min_len**, **max_len** - min and max valid lenghth 
+- *Number*: **min**, **max** - min and max valid value (can be float)
+- *Array*:  **min_items**, **max_items** - min and max count of items in array  
     **item** - scope tag, contains validation tags for each item
-- Pointer: **nullable**, **not_null** - it's clear
-- Interface: **func** - name of func that will be used for validation,  
+- *Pointer*: **nullable**, **not_null** - it's clear
+- *Interface*: **func** - name of func that will be used for validation,  
     function should be like `func NameOfFunc(i interface{})error{..}` 
-- Struct: **method** - name of the method of this struct, `func(s Struct) MethodName()error{..}`  
+- *Struct*: **method** - name of the method of this struct, `func(s Struct) MethodName()error{..}`  
     **func** - the same as for interface, but param can be as struct type.
-- Map: **min_items**, **max_items** - min and max count of items in map  
+- *Map*: **min_items**, **max_items** - min and max count of items in map  
     **key**, **value** - scope tags, contains validation tags for key or value 
 
 ##### Default validation - no Validation    
