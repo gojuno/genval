@@ -3,6 +3,7 @@ Generates Validate() methods for all structs in pkg by tags
 - no reflection in generated code - it means fast  
 - generator not needed on runtime
 - possibilities to override generated behavior for local purposes
+- can be used as `//go generate genval pkg` 
 
 Installation
 ------------
@@ -11,7 +12,7 @@ Installation
 Usage and documentation
 ------
     ./genval packageWithStructsForGeneration
-##### Addition flags
+##### Additional flags
     outputFile - output file name (default: validators_generated.go)
     needValidatableCheck - check struct on Validatable before calling Validate() (default: true)
 
