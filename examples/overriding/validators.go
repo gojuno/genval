@@ -78,7 +78,7 @@ func (r Age4) Validate() error {
 }
 
 func (r Request1) validate() error {
-	if err := callValidateIfValidatable(r.Age); err != nil {
+	if err := r.Age.Validate(); err != nil {
 		return err
 	}
 	if r.Some < 3 {
@@ -125,7 +125,7 @@ func (r Request3) Validate() error {
 }
 
 func (r Request4) validate() error {
-	if err := callValidateIfValidatable(r.Age); err != nil {
+	if err := r.Age.Validate(); err != nil {
 		return err
 	}
 	if r.Some < 3 {

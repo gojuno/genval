@@ -24,7 +24,7 @@ func callValidateIfValidatable(i interface{}) error {
 }
 
 func (r AliasOnDogsMapAlias) validate() error {
-	if err := callValidateIfValidatable(r); err != nil {
+	if err := r.Validate(); err != nil {
 		return err
 	}
 	return nil
@@ -52,7 +52,7 @@ func (r DogsMapAlias) validate() error {
 	for k, v := range r {
 		_ = k
 		_ = v
-		if err := callValidateIfValidatable(v); err != nil {
+		if err := v.Validate(); err != nil {
 			return err
 		}
 	}
@@ -125,11 +125,11 @@ func (r User) validate() error {
 	if r.Float > 42.55 {
 		return fmt.Errorf("field Float is more than 42.55 ")
 	}
-	if err := callValidateIfValidatable(r.Dog); err != nil {
+	if err := r.Dog.Validate(); err != nil {
 		return err
 	}
 	if r.DogPointer != nil {
-		if err := callValidateIfValidatable(r.DogPointer); err != nil {
+		if err := r.DogPointer.Validate(); err != nil {
 			return err
 		}
 	}
@@ -151,7 +151,7 @@ func (r User) validate() error {
 	for _, x := range r.Dogs {
 		_ = x
 		if x != nil {
-			if err := callValidateIfValidatable(x); err != nil {
+			if err := x.Validate(); err != nil {
 				return err
 			}
 		}
@@ -202,10 +202,10 @@ func (r User) validate() error {
 			return err
 		}
 	}
-	if err := callValidateIfValidatable(r.Alias); err != nil {
+	if err := r.Alias.Validate(); err != nil {
 		return err
 	}
-	if err := callValidateIfValidatable(r.AliasOnAlias); err != nil {
+	if err := r.AliasOnAlias.Validate(); err != nil {
 		return err
 	}
 	for k, v := range r.MapOfMap {

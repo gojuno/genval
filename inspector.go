@@ -142,8 +142,7 @@ func parseFieldType(t ast.Expr, logCtx string) types.TypeDef {
 		}
 		return types.NewStruct(v.Name)
 	case *ast.SelectorExpr:
-		// v.X - contains pkg : if x, ok := v.X.(*ast.Ident); ok { x.Name+"."+v.Sel.Name)}
-		return types.NewStruct(v.Sel.Name)
+		return types.NewExternalStruct(v.Sel.Name)
 	case *ast.ArrayType:
 		return types.NewArray(parseFieldType(v.Elt, logCtx))
 	case *ast.StarExpr:

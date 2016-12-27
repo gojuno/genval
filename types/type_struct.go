@@ -6,11 +6,15 @@ import (
 )
 
 func NewStruct(typeName string) *typeStruct {
-	return &typeStruct{typeName: typeName}
+	return &typeStruct{typeName: typeName, external: false}
+}
+func NewExternalStruct(typeName string) *typeStruct {
+	return &typeStruct{typeName: typeName, external: true}
 }
 
 type typeStruct struct {
 	typeName string
+	external bool
 	Method   *string
 	Func     *string
 }
@@ -43,12 +47,12 @@ func (t typeStruct) Generate(w io.Writer, cfg GenConfig, name Name) {
 		fmt.Fprintf(w, "if err := %s(%s); err != nil {\n", *t.Func, name.Full())
 		fmt.Fprintf(w, "    return err\n")
 		fmt.Fprintf(w, "}\n")
-	case cfg.NeedValidatableCheck:
-		fmt.Fprintf(w, "if err := callValidateIfValidatable(%s); err != nil {\n", name.WithoutPointer())
+	case !cfg.NeedValidatableCheck, !t.external:
+		fmt.Fprintf(w, "if err := %s.Validate(); err != nil {\n", name.WithoutPointer())
 		fmt.Fprintf(w, "    return err\n")
 		fmt.Fprintf(w, "}\n")
 	default:
-		fmt.Fprintf(w, "if err := %s.Validate(); err != nil {\n", name.WithoutPointer())
+		fmt.Fprintf(w, "if err := callValidateIfValidatable(%s); err != nil {\n", name.WithoutPointer())
 		fmt.Fprintf(w, "    return err\n")
 		fmt.Fprintf(w, "}\n")
 	}

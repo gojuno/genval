@@ -50,7 +50,7 @@ func (r User) validate() error {
 	if r.Age > 95 {
 		return fmt.Errorf("field Age is more than 95 ")
 	}
-	if err := callValidateIfValidatable(r.Dog); err != nil {
+	if err := r.Dog.Validate(); err != nil {
 		return err
 	}
 	if len(r.Emails) < 1 {

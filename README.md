@@ -4,6 +4,7 @@ Generates Validate() methods for all structs in pkg by tags
 - generator not needed on runtime
 - possibilities to override generated behavior for local purposes
 - can be used as `//go:generate genval pkg` 
+- if type has constants, validation will be by all found constants 
 
 Installation
 ------------
@@ -17,21 +18,24 @@ Usage and documentation
     needValidatableCheck - check struct on Validatable before calling Validate() (default: true)
 
 ##### Supported tags:
-    String: min_len, max_len
-    Number: min, max
-    Array:  min_items, max_items, item
-    Pointer: nullable, not_null
-    Interface: func
-    Struct: method, func
-    Map: min_items, max_items, key, value
+    String: *min_len*, *max_len* - min and max valid lenghth 
+    Number: *min*, *max* - min and max valid value (can be float)
+    Array:  *min_items*, *max_items* - min and max count of items in array
+        *item* - scope tag, contains validation tags for each item
+    Pointer: *nullable*, *not_null* - it's clear
+    Interface: *func* - name of func that will be used for validation,
+        function should be like `func NameOfFunc(i interface{})error{..}` 
+    Struct: *method* - name of the method of this struct, `func(s Struct) MethodName()error{..}`
+        *func* - the same as for interface, but param can be as struct type.
+    Map: *min_items*, *max_items* - min and max count of items in map
+        *key*, *value* - scope tags, contains validation tags for key or value 
 
 ##### Default validation - no Validation    
 
 ##### Some tips:
 1. not use interface{} if you can
-2. try flag needValidatableCheck=false 
-3. commit generated code under source control
-4. **read generated code** if needed, do not afraid it
+2. commit generated code under source control
+3. **read generated code** if needed, do not afraid it
 
 ##### Ways to override generated behavior(see examples or try yourself): 
 1. custom `(r Struct)Validate() error` method
@@ -53,5 +57,24 @@ type Dog struct {
 
 - [Simple](https://github.com/l1va/genval/tree/master/examples/simple)
 - [Complicated](https://github.com/l1va/genval/tree/master/examples/complicated)
-- [Complicated without Validatable check(-needValidatableCheck=false)](https://github.com/l1va/genval/tree/master/examples/complicated_without_check)
 - [Overriding generated validators](https://github.com/l1va/genval/tree/master/examples/overriding)
+
+Validation by constants :
+```
+type State int
+
+const (
+    StateOk    State = 200
+    StateError State = 400
+)
+//generated:
+func (r State) validate() error {
+    switch r {
+    case StateOk:
+    case StateError:
+    default:
+        return fmt.Errorf("invalid value for enum State: %v", r)
+    }
+    return nil
+}
+```
