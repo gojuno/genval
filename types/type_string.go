@@ -38,7 +38,7 @@ func (t typeString) Generate(w io.Writer, cfg GenConfig, name Name) {
 			cfg.AddImport("fmt")
 			cfg.AddImport("unicode/utf8")
 			fmt.Fprintf(w, "if utf8.RuneCountInString(%s) < %s {\n", name.Full(), *t.MinLen)
-			fmt.Fprintf(w, "	return fmt.Errorf(\"field %s is less than %s \" )\n", name.FieldName(), *t.MinLen)
+			fmt.Fprintf(w, "	return fmt.Errorf(\"field %s is shorter than %s chars\" )\n", name.FieldName(), *t.MinLen)
 			fmt.Fprintf(w, "}\n")
 		}
 	}
@@ -46,7 +46,7 @@ func (t typeString) Generate(w io.Writer, cfg GenConfig, name Name) {
 		cfg.AddImport("fmt")
 		cfg.AddImport("unicode/utf8")
 		fmt.Fprintf(w, "if utf8.RuneCountInString(%s) > %s {\n", name.Full(), *t.MaxLen)
-		fmt.Fprintf(w, "	return fmt.Errorf(\"field %s is more than %s \" )\n", name.FieldName(), *t.MaxLen)
+		fmt.Fprintf(w, "	return fmt.Errorf(\"field %s is longer than %s chars\" )\n", name.FieldName(), *t.MaxLen)
 		fmt.Fprintf(w, "}\n")
 	}
 }
@@ -57,13 +57,13 @@ func (t typeString) Validate() error {
 		t.MaxLen,
 		func(min float64) error {
 			if min < 0 {
-				return fmt.Errorf("min_len can't be less than 0, %f", min)
+				return fmt.Errorf("min_len can't be less than 0: %f", min)
 			}
 			return nil
 		},
 		func(max float64) error {
 			if max < 0 {
-				return fmt.Errorf("max_len can't be less than 0, %f", max)
+				return fmt.Errorf("max_len can't be less than 0: %f", max)
 			}
 			return nil
 		},

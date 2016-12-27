@@ -36,10 +36,10 @@ func (r AliasOnDogsMapAlias) Validate() error {
 
 func (r Dog) validate() error {
 	if utf8.RuneCountInString(r.Name) < 1 {
-		return fmt.Errorf("field Name is less than 1 ")
+		return fmt.Errorf("field Name is shorter than 1 chars")
 	}
 	if utf8.RuneCountInString(r.Name) > 64 {
-		return fmt.Errorf("field Name is more than 64 ")
+		return fmt.Errorf("field Name is longer than 64 chars")
 	}
 	return nil
 }
@@ -91,17 +91,17 @@ func (r Status) Validate() error {
 
 func (r User) validate() error {
 	if utf8.RuneCountInString(r.Name) < 3 {
-		return fmt.Errorf("field Name is less than 3 ")
+		return fmt.Errorf("field Name is shorter than 3 chars")
 	}
 	if utf8.RuneCountInString(r.Name) > 64 {
-		return fmt.Errorf("field Name is more than 64 ")
+		return fmt.Errorf("field Name is longer than 64 chars")
 	}
 	if r.LastName != nil {
 		if utf8.RuneCountInString(*r.LastName) < 1 {
-			return fmt.Errorf("field LastName is less than 1 ")
+			return fmt.Errorf("field LastName is shorter than 1 chars")
 		}
 		if utf8.RuneCountInString(*r.LastName) > 5 {
-			return fmt.Errorf("field LastName is more than 5 ")
+			return fmt.Errorf("field LastName is longer than 5 chars")
 		}
 	}
 	if r.Age < 18 {
@@ -142,7 +142,7 @@ func (r User) validate() error {
 	for _, x := range r.Urls {
 		_ = x
 		if utf8.RuneCountInString(x) > 256 {
-			return fmt.Errorf("field x is more than 256 ")
+			return fmt.Errorf("field x is longer than 256 chars")
 		}
 	}
 	if len(r.Dogs) < 1 {
@@ -186,7 +186,7 @@ func (r User) validate() error {
 		_ = k
 		_ = v
 		if utf8.RuneCountInString(k) > 64 {
-			return fmt.Errorf("field k is more than 64 ")
+			return fmt.Errorf("field k is longer than 64 chars")
 		}
 		if v < -35 {
 			return fmt.Errorf("field v is less than -35 ")
@@ -218,7 +218,7 @@ func (r User) validate() error {
 			_ = k
 			_ = v
 			if utf8.RuneCountInString(v) < 3 {
-				return fmt.Errorf("field v is less than 3 ")
+				return fmt.Errorf("field v is shorter than 3 chars")
 			}
 		}
 	}

@@ -15,22 +15,22 @@ Usage and documentation
     ./genval packageWithStructsForGeneration 
 or as go:generate directive
     //go:generate genval packageWithStructsForGeneration
-    
+
 ##### Additional flags
     outputFile - output file name (default: validators.go)
     needValidatableCheck - check struct on Validatable before calling Validate() (default: true)
 
 ##### Supported tags:
-String: *min_len*, *max_len* - min and max valid lenghth 
-Number: *min*, *max* - min and max valid value (can be float)
-Array:  *min_items*, *max_items* - min and max count of items in array
+- String: *min_len*, *max_len* - min and max valid lenghth 
+- Number: *min*, *max* - min and max valid value (can be float)
+- Array:  *min_items*, *max_items* - min and max count of items in array
     *item* - scope tag, contains validation tags for each item
-Pointer: *nullable*, *not_null* - it's clear
-Interface: *func* - name of func that will be used for validation,
+- Pointer: *nullable*, *not_null* - it's clear
+- Interface: *func* - name of func that will be used for validation,
     function should be like `func NameOfFunc(i interface{})error{..}` 
-Struct: *method* - name of the method of this struct, `func(s Struct) MethodName()error{..}`
+- Struct: *method* - name of the method of this struct, `func(s Struct) MethodName()error{..}`
     *func* - the same as for interface, but param can be as struct type.
-Map: *min_items*, *max_items* - min and max count of items in map
+- Map: *min_items*, *max_items* - min and max count of items in map
     *key*, *value* - scope tags, contains validation tags for key or value 
 
 ##### Default validation - no Validation    
@@ -48,16 +48,31 @@ Map: *min_items*, *max_items* - min and max count of items in map
 [Generated code](https://github.com/l1va/genval/blob/master/examples/simple/validators.go) for next structs:
 ```go
 type User struct {
-    Name string `validate:"min_len=3,max_len=64"`
-    Age  uint   `validate:"min=18,max=95"`
-    Dog  Dog
-    Emails map[int]string `validate:"min_items=1,key=[max=3],value=[min_len=5]"`
+    Name string `validate:"max_len=64"`
+    Age  uint   `validate:"min=18"`
+    Emails []string `validate:"min_items=1,item=[min_len=5]"`
 }
-type Dog struct {
-    Name string `validate:"min_len=1,max_len=64"`
+//generated:
+func (r User) validate() error {
+    if utf8.RuneCountInString(r.Name) > 64 {
+        return fmt.Errorf("field Name is longer than 64 chars")
+    }
+    if r.Age < 18 {
+        return fmt.Errorf("field Age is shorter than 18 chars")
+    }
+    if len(r.Emails) < 1 {
+        return fmt.Errorf("array Emails has less items than 1 ")
+    }
+    for _, x := range r.Emails {
+        _ = x
+        if utf8.RuneCountInString(x) < 5 {
+            return fmt.Errorf("field x is shorter than 5 chars")
+        }
+    }
+    return nil
 }
 ```
-
+Other examples:
 - [Simple](https://github.com/l1va/genval/tree/master/examples/simple)
 - [Complicated](https://github.com/l1va/genval/tree/master/examples/complicated)
 - [Overriding generated validators](https://github.com/l1va/genval/tree/master/examples/overriding)

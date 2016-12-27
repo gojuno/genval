@@ -25,10 +25,10 @@ func callValidateIfValidatable(i interface{}) error {
 
 func (r Dog) validate() error {
 	if utf8.RuneCountInString(r.Name) < 1 {
-		return fmt.Errorf("field Name is less than 1 ")
+		return fmt.Errorf("field Name is shorter than 1 chars")
 	}
 	if utf8.RuneCountInString(r.Name) > 64 {
-		return fmt.Errorf("field Name is more than 64 ")
+		return fmt.Errorf("field Name is longer than 64 chars")
 	}
 	return nil
 }
@@ -39,10 +39,10 @@ func (r Dog) Validate() error {
 
 func (r User) validate() error {
 	if utf8.RuneCountInString(r.Name) < 3 {
-		return fmt.Errorf("field Name is less than 3 ")
+		return fmt.Errorf("field Name is shorter than 3 chars")
 	}
 	if utf8.RuneCountInString(r.Name) > 64 {
-		return fmt.Errorf("field Name is more than 64 ")
+		return fmt.Errorf("field Name is longer than 64 chars")
 	}
 	if r.Age < 18 {
 		return fmt.Errorf("field Age is less than 18 ")
@@ -63,7 +63,7 @@ func (r User) validate() error {
 			return fmt.Errorf("field k is more than 3 ")
 		}
 		if utf8.RuneCountInString(v) < 5 {
-			return fmt.Errorf("field v is less than 5 ")
+			return fmt.Errorf("field v is shorter than 5 chars")
 		}
 	}
 	return nil

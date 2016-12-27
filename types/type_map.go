@@ -77,13 +77,13 @@ func (t typeMap) Validate() error {
 		t.Max,
 		func(min float64) error {
 			if min < 0 {
-				return fmt.Errorf("min map items can't be less than 0, %f", min)
+				return fmt.Errorf("min map items can't be less than 0: %f", min)
 			}
 			return nil
 		},
 		func(max float64) error {
 			if max < 0 {
-				return fmt.Errorf("max map items can't be less than 0, %f", max)
+				return fmt.Errorf("max map items can't be less than 0: %f", max)
 			}
 			return nil
 		},
