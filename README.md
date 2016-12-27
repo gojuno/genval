@@ -14,6 +14,7 @@ Usage and documentation
 ------
     `./genval packageWithStructsForGeneration` 
 or as go:generate directive  
+
     `//go:generate genval packageWithStructsForGeneration`
 
 ##### Additional flags
