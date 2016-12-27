@@ -7,7 +7,7 @@ import (
 
 func NewPointer(inner TypeDef) *typePointer {
 	return &typePointer{
-		Nullable:  false,
+		Nullable:  true,
 		InnerType: inner,
 	}
 }

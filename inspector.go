@@ -83,7 +83,7 @@ func (insp *inspector) Visit(node ast.Node) ast.Visitor {
 			if x, ok := st.(*ast.Ident); ok {
 				insp.publicValidators[x.Name] = true
 			} else {
-				log.Fatalf("method Validate should be like: func (s Struct)Validate() error{...}")
+				log.Fatalf("method Validate should be: 'func (s Struct)Validate() error{...}' not on pointer, %+v,%T", st, st)
 			}
 		}
 		return nil

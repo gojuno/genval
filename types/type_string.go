@@ -6,10 +6,7 @@ import (
 )
 
 func NewString() *typeString {
-	defaultMinLen := "1"
-	return &typeString{
-		MinLen: &defaultMinLen,
-	}
+	return &typeString{}
 }
 
 type typeString struct {

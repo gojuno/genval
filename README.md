@@ -3,7 +3,7 @@ Generates Validate() methods for all structs in pkg by tags
 - no reflection in generated code - it means fast  
 - generator not needed on runtime
 - possibilities to override generated behavior for local purposes
-- can be used as `//go generate genval pkg` 
+- can be used as `//go:generate genval pkg` 
 
 Installation
 ------------
@@ -25,10 +25,7 @@ Usage and documentation
     Struct: method, func
     Map: min_items, max_items, key, value
 
-##### Default validation:
-    String: min_len=1
-    Pointer: not_null
-    Other: no validation
+##### Default validation - no Validation    
 
 ##### Some tips:
 1. not use interface{} if you can
@@ -56,4 +53,5 @@ type Dog struct {
 
 - [Simple](https://github.com/l1va/genval/tree/master/examples/simple)
 - [Complicated](https://github.com/l1va/genval/tree/master/examples/complicated)
+- [Complicated without Validatable check(flag -needValidatableCheck=false)](https://github.com/l1va/genval/tree/master/examples/complicated_without_check)
 - [Overriding generated validators](https://github.com/l1va/genval/tree/master/examples/overriding)
