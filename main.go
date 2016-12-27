@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	outputFilePtr := flag.String("outputFile", "validators_generated.go", "output file name")
+	outputFilePtr := flag.String("outputFile", "validators.go", "output file name")
 	needValidatableCheckPtr := flag.Bool("needValidatableCheck", true, "check struct on Validatable before calling Validate()")
 
 	flag.Parse()

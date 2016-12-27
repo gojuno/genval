@@ -13,7 +13,7 @@ Usage and documentation
 ------
     ./genval packageWithStructsForGeneration
 ##### Additional flags
-    outputFile - output file name (default: validators_generated.go)
+    outputFile - output file name (default: validators.go)
     needValidatableCheck - check struct on Validatable before calling Validate() (default: true)
 
 ##### Supported tags:
@@ -38,7 +38,7 @@ Usage and documentation
 2. `func` or `method` tags for fields
 
 ##### Examples:
-[Generated code](https://github.com/l1va/genval/blob/master/examples/simple/validators_generated.go) for next structs:
+[Generated code](https://github.com/l1va/genval/blob/master/examples/simple/validators.go) for next structs:
 ```go
 type User struct {
     Name string `validate:"min_len=3,max_len=64"`
@@ -53,5 +53,5 @@ type Dog struct {
 
 - [Simple](https://github.com/l1va/genval/tree/master/examples/simple)
 - [Complicated](https://github.com/l1va/genval/tree/master/examples/complicated)
-- [Complicated without Validatable check(flag -needValidatableCheck=false)](https://github.com/l1va/genval/tree/master/examples/complicated_without_check)
+- [Complicated without Validatable check(-needValidatableCheck=false)](https://github.com/l1va/genval/tree/master/examples/complicated_without_check)
 - [Overriding generated validators](https://github.com/l1va/genval/tree/master/examples/overriding)
