@@ -12,10 +12,10 @@ Installation
 
 Usage and documentation
 ------
-    `./genval packageWithStructsForGeneration` 
+    ./genval packageWithStructsForGeneration  
 or as go:generate directive  
 
-    `//go:generate genval packageWithStructsForGeneration`
+    //go:generate genval packageWithStructsForGeneration
 
 ##### Additional flags
     outputFile - output file name (default: validators.go)
@@ -29,9 +29,9 @@ or as go:generate directive
 - *Pointer*: **nullable**, **not_null** - it's clear
 - *Interface*: **func** - the same as for struct (`func NameOfTheFunc(i interface{})error{..}`)
 - *Struct*: **func** - name of the method of this struct (`func(s Struct) MethodName()error{..}`)  
-    or name of the func that will be used for validation (`func NameOfTheFunc(s Struct)error{..}`)      
-    *Can be used not once:* `func=.MethodName,func=utils.NameOfTheFunc` or even `func=.MethodName;utils.NameOfTheFunc`  
-    *Methods should starts from '.'*
+    or name of the func that will be used for validation (`func nameOfTheFunc(s Struct)error{..}`)      
+    *Methods should starts from '.'*  
+    *Can be used not once:* `func=.MethodName,func=nameOfTheFunc` or even `func=.MethodName;nameOfTheFunc`    
 - *Map*: **min_items**, **max_items** - min and max count of items in map  
     **key**, **value** - scope tags, contains validation tags for key or value 
 
