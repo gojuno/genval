@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+	"strings"
 )
 
 type TypeDef interface {
@@ -88,4 +89,15 @@ func validateMinMax(minStr, maxStr *string, minValidate, maxValidate func(float6
 	}
 	return nil
 
+}
+
+func parseFuncsParam(p string) []string {
+	r := strings.Split(p, ";")
+	var res []string
+	for _, v := range r {
+		if v != "" {
+			res = append(res, v)
+		}
+	}
+	return res
 }

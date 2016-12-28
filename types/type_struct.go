@@ -3,6 +3,7 @@ package types
 import (
 	"fmt"
 	"io"
+	"strings"
 )
 
 func NewStruct(typeName string) *typeStruct {
@@ -15,8 +16,7 @@ func NewExternalStruct(typeName string) *typeStruct {
 type typeStruct struct {
 	typeName string
 	external bool
-	Method   *string
-	Func     *string
+	funcs    []string
 }
 
 func (t typeStruct) Type() string {
@@ -25,12 +25,10 @@ func (t typeStruct) Type() string {
 
 func (t *typeStruct) SetTag(tag Tag) error {
 	switch tag.Key() {
-	case StructMethodKey:
-		st := tag.(SimpleTag)
-		t.Method = &st.Param
 	case StructFuncKey:
-		st := tag.(SimpleTag)
-		t.Func = &st.Param
+		for _, v := range parseFuncsParam(tag.(SimpleTag).Param) {
+			t.funcs = append(t.funcs, v)
+		}
 	default:
 		return ErrUnusedTag
 	}
@@ -39,14 +37,18 @@ func (t *typeStruct) SetTag(tag Tag) error {
 
 func (t typeStruct) Generate(w io.Writer, cfg GenConfig, name Name) {
 	switch {
-	case t.Method != nil:
-		fmt.Fprintf(w, "if err := %s.%s(); err != nil {\n", name.WithoutPointer(), *t.Method)
-		fmt.Fprintf(w, "    return err\n")
-		fmt.Fprintf(w, "}\n")
-	case t.Func != nil:
-		fmt.Fprintf(w, "if err := %s(%s); err != nil {\n", *t.Func, name.Full())
-		fmt.Fprintf(w, "    return err\n")
-		fmt.Fprintf(w, "}\n")
+	case len(t.funcs) != 0:
+		for _, f := range t.funcs {
+			if strings.HasPrefix(f, ".") {
+				fmt.Fprintf(w, "if err := %s%s(); err != nil {\n", name.WithoutPointer(), f)
+				fmt.Fprintf(w, "    return err\n")
+				fmt.Fprintf(w, "}\n")
+			} else {
+				fmt.Fprintf(w, "if err := %s(%s); err != nil {\n", f, name.Full())
+				fmt.Fprintf(w, "    return err\n")
+				fmt.Fprintf(w, "}\n")
+			}
+		}
 	case !cfg.NeedValidatableCheck, !t.external:
 		fmt.Fprintf(w, "if err := %s.Validate(); err != nil {\n", name.WithoutPointer())
 		fmt.Fprintf(w, "    return err\n")
@@ -59,8 +61,5 @@ func (t typeStruct) Generate(w io.Writer, cfg GenConfig, name Name) {
 }
 
 func (t typeStruct) Validate() error {
-	if t.Func != nil && t.Method != nil {
-		return fmt.Errorf("could not use func and method at the same time")
-	}
 	return nil
 }

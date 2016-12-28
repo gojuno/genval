@@ -2,10 +2,10 @@ package overriding
 
 import "fmt"
 
-//public validator for Request2 will be generated and will use ValidateMin10 method for Name,
-//validator for Name2 will not changed.
+//public validator for Request2 will be generated and will use ValidateMin10 method for Age2,
+//validator for Age2 will not changed.
 type Request2 struct {
-	Age  Age2 `validate:"method=ValidateMin10"`
+	Age  Age2 `validate:"func=.ValidateMin10"`
 	Some int  `validate:"min=3,max=64"`
 }
 

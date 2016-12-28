@@ -3,7 +3,7 @@ package overriding
 import "fmt"
 
 //public validator for Request1 will not be generated because of overriding,
-//validator for Name1 will not changed.
+//validator for Age1 will not changed.
 type Request1 struct {
 	Age  Age1
 	Some int `validate:"min=3,max=64"`

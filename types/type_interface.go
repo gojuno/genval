@@ -10,7 +10,7 @@ func NewInterface() *typeInterface {
 }
 
 type typeInterface struct {
-	Func *string
+	funcs []string
 }
 
 func (t typeInterface) Type() string {
@@ -20,8 +20,9 @@ func (t typeInterface) Type() string {
 func (t *typeInterface) SetTag(tag Tag) error {
 	switch tag.Key() {
 	case InterfaceFuncKey:
-		st := tag.(SimpleTag)
-		t.Func = &st.Param
+		for _, v := range parseFuncsParam(tag.(SimpleTag).Param) {
+			t.funcs = append(t.funcs, v)
+		}
 	default:
 		return ErrUnusedTag
 	}
@@ -29,8 +30,8 @@ func (t *typeInterface) SetTag(tag Tag) error {
 }
 
 func (t typeInterface) Generate(w io.Writer, cfg GenConfig, name Name) {
-	if t.Func != nil {
-		fmt.Fprintf(w, "if err:=%s(%s); err!=nil {\n", *t.Func, name.Full())
+	for _, f := range t.funcs {
+		fmt.Fprintf(w, "if err:=%s(%s); err!=nil {\n", f, name.Full())
 		fmt.Fprintf(w, "    return err\n")
 		fmt.Fprintf(w, "}\n")
 	}

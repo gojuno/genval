@@ -27,10 +27,11 @@ or as go:generate directive
 - *Array*:  **min_items**, **max_items** - min and max count of items in array  
     **item** - scope tag, contains validation tags for each item
 - *Pointer*: **nullable**, **not_null** - it's clear
-- *Interface*: **func** - name of func that will be used for validation,  
-    function should be like `func NameOfFunc(i interface{})error{..}` 
-- *Struct*: **method** - name of the method of this struct, `func(s Struct) MethodName()error{..}`  
-    **func** - the same as for interface, but param can be as struct type.
+- *Interface*: **func** - the same as for struct (`func NameOfTheFunc(i interface{})error{..}`)
+- *Struct*: **func** - name of the method of this struct (`func(s Struct) MethodName()error{..}`)  
+    or name of the func that will be used for validation (`func NameOfTheFunc(s Struct)error{..}`)      
+    *Can be used not once:* `func=.MethodName,func=utils.NameOfTheFunc` or even `func=.MethodName;utils.NameOfTheFunc`  
+    *Methods should starts from '.'*
 - *Map*: **min_items**, **max_items** - min and max count of items in map  
     **key**, **value** - scope tags, contains validation tags for key or value 
 
@@ -43,7 +44,7 @@ or as go:generate directive
 
 ##### Ways to override generated behavior(see examples or try yourself): 
 1. custom `(r Struct)Validate() error` method
-2. `func` or `method` tags for fields
+2. `func` tag for types
 
 ##### Examples:
 ```go

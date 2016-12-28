@@ -1,5 +1,10 @@
 package complicated
 
+import (
+	"fmt"
+	"unicode/utf8"
+)
+
 type User struct {
 	Name          string  `validate:"min_len=3,max_len=64"`
 	LastName      *string `validate:"nullable,min_len=1,max_len=5"`
@@ -8,7 +13,7 @@ type User struct {
 	Float         float64 `validate:"min=-4.22,max=42.55"`
 	Dog           Dog
 	DogPointer    *Dog
-	DogOptional   Dog      `validate:"method=ValidateOptional"`
+	DogOptional   Dog      `validate:"func=.ValidateOptional"`
 	Urls          []string `validate:"min_items=1,item=[max_len=256]"`
 	Dogs          []*Dog   `validate:"min_items=1,item=[nullable]"`
 	Test          *[]int   `validate:"nullable,min_items=1,item=[min=4]"`
@@ -16,7 +21,7 @@ type User struct {
 	Some          interface{}    `validate:"func=validateSome"`
 	SomeArray     []interface{}  `validate:"min_items=1,item=[func=validateSome]"`
 	Dict          map[string]int `validate:"min_items=2,key=[max_len=64],value=[min=-35,max=34]"`
-	DictDogs      map[string]Dog `validate:"value=[method=ValidateOptional]"`
+	DictDogs      map[string]Dog `validate:"value=[func=.ValidateOptional;validateMaxDogName]"`
 	Alias         DogsMapAlias
 	AliasOnAlias  AliasOnDogsMapAlias
 	MapOfMap      map[string]map[int]string `validate:"value=[min_items=1,value=[min_len=3]]"`
@@ -32,6 +37,13 @@ type Dog struct {
 
 func (Dog) ValidateOptional() error {
 	return nil //len(dog.Name) is not validating here
+}
+
+func validateMaxDogName(d Dog) error {
+	if utf8.RuneCountInString(d.Name) > 128 {
+		return fmt.Errorf("field Name is longer than 128 chars")
+	}
+	return nil
 }
 
 type DogsMapAlias map[string]Dog

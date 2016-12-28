@@ -201,6 +201,9 @@ func (r User) validate() error {
 		if err := v.ValidateOptional(); err != nil {
 			return err
 		}
+		if err := validateMaxDogName(v); err != nil {
+			return err
+		}
 	}
 	if err := r.Alias.Validate(); err != nil {
 		return err

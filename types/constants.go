@@ -18,8 +18,7 @@ const (
 
 	InterfaceFuncKey string = "func"
 
-	StructMethodKey string = "method"
-	StructFuncKey   string = "func"
+	StructFuncKey string = "func"
 
 	MapMinItemsKey string = "min_items"
 	MapMaxItemsKey string = "max_items"
