@@ -9,7 +9,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/l1va/genval/types"
+	"github.com/gojuno/genval/types"
 )
 
 type inspector struct {

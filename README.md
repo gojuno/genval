@@ -1,4 +1,5 @@
-# genval
+# genval [![Build Status](https://travis-ci.org/gojuno/genval.svg?branch=master)](https://travis-ci.org/gojuno/genval)
+
 Generates Validate() methods for all structs in pkg by tags
 - no reflection in generated code - it means fast  
 - generator not needed on runtime
@@ -74,9 +75,9 @@ func (r User) validate() error {
 }
 ```
 Other examples:
-- [Simple](https://github.com/l1va/genval/tree/master/examples/simple)
-- [Complicated](https://github.com/l1va/genval/tree/master/examples/complicated)
-- [Overriding generated validators](https://github.com/l1va/genval/tree/master/examples/overriding)
+- [Simple](https://github.com/gojuno/genval/tree/master/examples/simple)
+- [Complicated](https://github.com/gojuno/genval/tree/master/examples/complicated)
+- [Overriding generated validators](https://github.com/gojuno/genval/tree/master/examples/overriding)
 
 Validation by constants :
 ```go

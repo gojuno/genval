@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/l1va/genval/types"
+	"github.com/gojuno/genval/types"
 )
 
 type StructDef struct {

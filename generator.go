@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"sort"
 
-	"github.com/l1va/genval/types"
+	"github.com/gojuno/genval/types"
 )
 
 type generator struct {
