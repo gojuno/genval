@@ -7,9 +7,10 @@ Generates Validate() methods for all structs in pkg by tags
 - can be used as `//go:generate genval pkg` 
 - if type has constants, validation will be by all found constants 
 
-Installation
-------------
-    go get github.com/gojuno/genval
+## Installation
+
+```go get github.com/gojuno/genval```
+
 
 Usage and documentation
 ------
