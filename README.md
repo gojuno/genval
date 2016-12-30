@@ -8,7 +8,7 @@ Generates Validate() methods for all structs in pkg by tags
 
 Installation
 ------------
-    go get github.com/l1va/genval
+    go get github.com/gojuno/genval
 
 Usage and documentation
 ------
