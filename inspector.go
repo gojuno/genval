@@ -125,7 +125,9 @@ func (insp *inspector) visitStruct(astTypeSpec *ast.TypeSpec) {
 		}
 		insp.addStruct(s)
 		return
-	case *ast.Ident, *ast.SelectorExpr, *ast.StarExpr, *ast.MapType, *ast.InterfaceType, *ast.ArrayType: //aliases
+		//*ParenExpr, or any of the *XxxTypes
+	case *ast.Ident, *ast.SelectorExpr, *ast.StarExpr, *ast.MapType, *ast.InterfaceType,
+		*ast.ArrayType, *ast.FuncType, *ast.ChanType: //aliases
 		aliasType := parseFieldType(v, fmt.Sprintf("struct %s", structName))
 		insp.addStruct(NewAliasStruct(structName, aliasType))
 	default:
@@ -153,6 +155,8 @@ func parseFieldType(t ast.Expr, logCtx string) types.TypeDef {
 		return types.NewMap(parseFieldType(v.Key, logCtx), parseFieldType(v.Value, logCtx))
 	case *ast.FuncType:
 		return types.NewFunc()
+	case *ast.ChanType:
+		return types.NewChan()
 	}
 	log.Fatalf("undefined typeField for %s: %+v, %T", logCtx, t, t)
 	return nil

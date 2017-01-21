@@ -25,6 +25,8 @@ type User struct {
 	Alias         DogsMapAlias
 	AliasOnAlias  AliasOnDogsMapAlias
 	MapOfMap      map[string]map[int]string `validate:"value=[min_items=1,value=[min_len=3]]"`
+	FuncField     func(int) string
+	ChanField     <-chan int
 }
 
 func validateSome(i interface{}) error {
@@ -49,3 +51,7 @@ func validateMaxDogName(d Dog) error {
 type DogsMapAlias map[string]Dog
 
 type AliasOnDogsMapAlias DogsMapAlias
+
+type TestFunc func() error
+
+type TestChan chan string

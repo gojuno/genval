@@ -89,6 +89,22 @@ func (r Status) Validate() error {
 	return r.validate()
 }
 
+func (r TestChan) validate() error {
+	return nil
+}
+
+func (r TestChan) Validate() error {
+	return r.validate()
+}
+
+func (r TestFunc) validate() error {
+	return nil
+}
+
+func (r TestFunc) Validate() error {
+	return r.validate()
+}
+
 func (r User) validate() error {
 	if utf8.RuneCountInString(r.Name) < 3 {
 		return fmt.Errorf("field Name is shorter than 3 chars")
