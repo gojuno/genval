@@ -23,14 +23,49 @@ func callValidateIfValidatable(i interface{}) error {
 	return nil
 }
 
+func (r AliasArray) validate() error {
+	for _, x := range r {
+		_ = x
+	}
+	return nil
+}
+
+func (r AliasArray) Validate() error {
+	return r.validate()
+}
+
+func (r AliasChan) validate() error {
+	return nil
+}
+
+func (r AliasChan) Validate() error {
+	return r.validate()
+}
+
+func (r AliasFunc) validate() error {
+	return nil
+}
+
+func (r AliasFunc) Validate() error {
+	return r.validate()
+}
+
 func (r AliasOnDogsMapAlias) validate() error {
-	if err := r.Validate(); err != nil {
+	if err := DogsMapAlias(r).Validate(); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (r AliasOnDogsMapAlias) Validate() error {
+	return r.validate()
+}
+
+func (r AliasString) validate() error {
+	return nil
+}
+
+func (r AliasString) Validate() error {
 	return r.validate()
 }
 
@@ -86,22 +121,6 @@ func (r Status) validate() error {
 }
 
 func (r Status) Validate() error {
-	return r.validate()
-}
-
-func (r TestChan) validate() error {
-	return nil
-}
-
-func (r TestChan) Validate() error {
-	return r.validate()
-}
-
-func (r TestFunc) validate() error {
-	return nil
-}
-
-func (r TestFunc) Validate() error {
 	return r.validate()
 }
 
@@ -225,6 +244,9 @@ func (r User) validate() error {
 		return err
 	}
 	if err := r.AliasOnAlias.Validate(); err != nil {
+		return err
+	}
+	if err := r.AliasOnAliasWithCustomValidate.ValidateAlias(); err != nil {
 		return err
 	}
 	for k, v := range r.MapOfMap {

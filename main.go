@@ -1,6 +1,8 @@
 package main
 
-//go:generate genval examples/api
+//go:generate genval examples/simple
+//go:generate genval examples/overriding
+//go:generate genval examples/complicated
 
 import (
 	"flag"

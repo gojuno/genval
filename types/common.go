@@ -23,6 +23,7 @@ type GenConfig struct {
 }
 
 type Name struct {
+	aliasType     *string
 	pointerPrefix string
 	structVar     string
 	fieldName     string
@@ -35,9 +36,18 @@ func (n Name) Full() string {
 func (n Name) WithoutPointer() string {
 	return n.structVar + n.fieldName
 }
+
+func (n Name) WithAlias() string {
+	if n.aliasType != nil {
+		return *n.aliasType + "(" + n.structVar + n.fieldName + ")"
+	}
+	return n.structVar + n.fieldName
+}
+
 func (n Name) FieldName() string {
 	return n.fieldName
 }
+
 func NewName(pointerPrefix, structVar, fieldName string) Name {
 	return Name{
 		pointerPrefix: pointerPrefix,
@@ -52,6 +62,15 @@ func NewSimpleName(fieldName string) Name {
 		fieldName:     fieldName,
 	}
 }
+func NewSimpleNameWithAliasType(fieldName, aliasType string) Name {
+	return Name{
+		aliasType:     &aliasType,
+		pointerPrefix: "",
+		structVar:     "",
+		fieldName:     fieldName,
+	}
+}
+
 func (n Name) WithPointer() Name {
 	return Name{
 		pointerPrefix: "*",

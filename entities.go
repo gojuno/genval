@@ -34,7 +34,7 @@ func (s StructDef) Generate(w io.Writer, cfg types.GenConfig) {
 		s.generateEnumValidator(w, cfg, varName)
 	case s.aliasType != nil:
 		aliasType := *s.aliasType
-		aliasType.Generate(w, cfg, types.NewSimpleName(varName))
+		aliasType.Generate(w, cfg, types.NewSimpleNameWithAliasType(varName, aliasType.Type()))
 	default:
 		for _, field := range s.fields {
 			field.fieldType.Generate(w, cfg, types.NewName("", varName+".", field.fieldName))
