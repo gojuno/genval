@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/gojuno/genval/types"
+	"regexp"
 )
 
 const (
@@ -24,6 +25,12 @@ type inspector struct {
 	enums                 map[string][]string
 }
 
+type inspectorConfig struct {
+	dir              string
+	outputFile       string
+	excludeRegexpStr string
+}
+
 func NewInspector() *inspector {
 	return &inspector{
 		overridenValidations:  make(map[string]bool),
@@ -32,8 +39,8 @@ func NewInspector() *inspector {
 	}
 }
 
-func (insp *inspector) Inspect(dir, outputFile string) error {
-	files, err := getFilesForInspect(dir, outputFile)
+func (insp *inspector) Inspect(cfg inspectorConfig) error {
+	files, err := getFilesForInspect(cfg)
 	if err != nil {
 		return err
 	}
@@ -63,8 +70,9 @@ func (insp *inspector) Result() []StructDef {
 	return res
 }
 
-func getFilesForInspect(dir, outputFile string) ([]string, error) {
-	if strings.HasPrefix(dir, "/") {
+func getFilesForInspect(cfg inspectorConfig) ([]string, error) {
+	dir := cfg.dir
+	if strings.HasPrefix(cfg.dir, "/") {
 		dir = "." + dir
 	}
 	var result []string
@@ -72,8 +80,17 @@ func getFilesForInspect(dir, outputFile string) ([]string, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to read dir %s: %s", dir, err)
 	}
+	r, err := regexp.Compile(cfg.excludeRegexpStr)
+	if err != nil {
+		return nil, fmt.Errorf("failed to compile regexp %q for %q: %v", cfg.excludeRegexpStr, cfg.excludeRegexpStr, err)
+	}
 	for _, f := range files {
-		if f.IsDir() || f.Name() == outputFile || strings.HasSuffix(f.Name(), "_test.go") || !strings.HasSuffix(f.Name(), ".go") {
+		if f.IsDir() ||
+			f.Name() == cfg.outputFile ||
+			strings.HasSuffix(f.Name(), "_test.go") ||
+			!strings.HasSuffix(f.Name(), ".go") ||
+			r.MatchString(f.Name()) {
+
 			continue
 		}
 		result = append(result, dir+"/"+f.Name())
@@ -147,9 +164,9 @@ func (insp *inspector) visitStruct(astTypeSpec *ast.TypeSpec) {
 		insp.addStruct(NewAliasStruct(structName, aliasType))
 
 	case *ast.StarExpr: //aliases
-		log.Fatalf("can not use alias on pointer with genval (because can not use pointer type as a receiver): %s, %+v: %T", structName, astTypeSpec, v)
+		//log.Fatalf("can not use alias on pointer with genval (because can not use pointer type as a receiver): %s, %+v: %T", structName, astTypeSpec, v)
 	case *ast.InterfaceType: //aliases
-		log.Fatalf("can not use alias on interface with genval (because can not use interface type as a receiver): %s, %+v: %T", structName, astTypeSpec, v)
+		//log.Fatalf("can not use alias on interface with genval (because can not use interface type as a receiver): %s, %+v: %T", structName, astTypeSpec, v)
 
 	default:
 		log.Fatalf("not expected Type for typeSpec: %s, %+v: %T", structName, astTypeSpec, astTypeSpec.Type)

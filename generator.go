@@ -28,7 +28,7 @@ func NewGenerator(structs []StructDef) generator {
 func (g generator) Generate(path, outputFile string, needCheck bool) error {
 	pkg := filepath.Base(path)
 	if pkg == "." {
-		pkg = "main"
+		pkg = "api"
 	}
 
 	cfg := types.GenConfig{
