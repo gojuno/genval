@@ -103,15 +103,13 @@ func (g generator) genImports(w io.Writer, pkg string, needValidatable bool) {
             {{ end }}        
         )
 	{{if .NeedValidatable}}  
-        type Validatable interface {
+        type validatable interface {
             Validate() error
         }
 
-        func callValidateIfValidatable(i interface{}) error {
-			if v, ok := i.(Validatable); ok {
-				if err := v.Validate(); err != nil {
-					return err
-				}
+        func validate(i interface{}) error {
+			if v, ok := i.(validatable); ok {
+				return v.Validate()
 			}
 			return nil
 		}

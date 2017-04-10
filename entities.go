@@ -8,11 +8,12 @@ import (
 )
 
 type StructDef struct {
-	Name                 string
-	PublicValidatorExist bool
-	EnumValues           []string
-	fields               []FieldDef
-	aliasType            *types.TypeDef
+	Name                    string
+	HasOverridenValidation  bool
+	HasAdditionalValidation bool
+	EnumValues              []string
+	fields                  []FieldDef
+	aliasType               *types.TypeDef
 }
 
 func NewFieldsStruct(name string) StructDef {
@@ -27,24 +28,28 @@ func (s *StructDef) AddField(f FieldDef) {
 }
 
 func (s StructDef) Generate(w io.Writer, cfg types.GenConfig) {
-	varName := "r"
-	fmt.Fprintf(w, "func (%s %s) validate() error {\n", varName, s.Name)
-	switch {
-	case len(s.EnumValues) > 0:
-		s.generateEnumValidator(w, cfg, varName)
-	case s.aliasType != nil:
-		aliasType := *s.aliasType
-		aliasType.Generate(w, cfg, types.NewSimpleNameWithAliasType(varName, aliasType.Type()))
-	default:
-		for _, field := range s.fields {
-			field.fieldType.Generate(w, cfg, types.NewName("", varName+".", field.fieldName))
+	if !s.HasOverridenValidation {
+		varName := "r"
+		fmt.Fprintf(w, "// Validate validates %s\n", s.Name)
+		fmt.Fprintf(w, "func (%s %s) Validate() error {\n", varName, s.Name)
+		switch {
+		case len(s.EnumValues) > 0:
+			s.generateEnumValidator(w, cfg, varName)
+		case s.aliasType != nil:
+			aliasType := *s.aliasType
+			aliasType.Generate(w, cfg, types.NewSimpleNameWithAliasType(varName, aliasType.Type()))
+		default:
+			for _, field := range s.fields {
+				field.fieldType.Generate(w, cfg, types.NewName("", varName+".", field.fieldName))
+			}
 		}
-	}
-	fmt.Fprintf(w, "	return nil\n")
-	fmt.Fprintf(w, "}\n\n")
-	if !s.PublicValidatorExist {
-		fmt.Fprintf(w, "func (r %s) Validate() error {\n", s.Name)
-		fmt.Fprintf(w, "	return r.validate()")
+
+		if s.HasAdditionalValidation {
+			fmt.Fprint(w, "    return r.validate()")
+		} else {
+			fmt.Fprintf(w, "	return nil\n")
+		}
+
 		fmt.Fprintf(w, "}\n\n")
 	}
 }

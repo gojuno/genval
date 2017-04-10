@@ -10,66 +10,50 @@ import (
 	"unicode/utf8"
 )
 
-type Validatable interface {
+type validatable interface {
 	Validate() error
 }
 
-func callValidateIfValidatable(i interface{}) error {
-	if v, ok := i.(Validatable); ok {
-		if err := v.Validate(); err != nil {
-			return err
-		}
+func validate(i interface{}) error {
+	if v, ok := i.(validatable); ok {
+		return v.Validate()
 	}
 	return nil
 }
 
-func (r AliasArray) validate() error {
+// Validate validates AliasArray
+func (r AliasArray) Validate() error {
 	for _, x := range r {
 		_ = x
 	}
 	return nil
 }
 
-func (r AliasArray) Validate() error {
-	return r.validate()
-}
-
-func (r AliasChan) validate() error {
-	return nil
-}
-
+// Validate validates AliasChan
 func (r AliasChan) Validate() error {
-	return r.validate()
-}
-
-func (r AliasFunc) validate() error {
 	return nil
 }
 
+// Validate validates AliasFunc
 func (r AliasFunc) Validate() error {
-	return r.validate()
+	return nil
 }
 
-func (r AliasOnDogsMapAlias) validate() error {
+// Validate validates AliasOnDogsMapAlias
+func (r AliasOnDogsMapAlias) Validate() error {
 	if err := DogsMapAlias(r).Validate(); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r AliasOnDogsMapAlias) Validate() error {
-	return r.validate()
-}
-
-func (r AliasString) validate() error {
+// Validate validates AliasString
+func (r AliasString) Validate() error {
 	return nil
 }
 
-func (r AliasString) Validate() error {
-	return r.validate()
-}
-
-func (r Dog) validate() error {
+// Validate validates Dog
+func (r Dog) Validate() error {
 	if utf8.RuneCountInString(r.Name) < 1 {
 		return fmt.Errorf("field Name is shorter than 1 chars")
 	}
@@ -79,11 +63,8 @@ func (r Dog) validate() error {
 	return nil
 }
 
-func (r Dog) Validate() error {
-	return r.validate()
-}
-
-func (r DogsMapAlias) validate() error {
+// Validate validates DogsMapAlias
+func (r DogsMapAlias) Validate() error {
 	for k, v := range r {
 		_ = k
 		_ = v
@@ -94,21 +75,8 @@ func (r DogsMapAlias) validate() error {
 	return nil
 }
 
-func (r DogsMapAlias) Validate() error {
-	return r.validate()
-}
-
-func (r State) validate() error {
-	switch r {
-	case StateOk:
-	case StateError:
-	default:
-		return fmt.Errorf("invalid value for enum State: %v", r)
-	}
-	return nil
-}
-
-func (r Status) validate() error {
+// Validate validates Status
+func (r Status) Validate() error {
 	switch r {
 	case StatusCreated:
 	case StatusPending:
@@ -120,11 +88,8 @@ func (r Status) validate() error {
 	return nil
 }
 
-func (r Status) Validate() error {
-	return r.validate()
-}
-
-func (r User) validate() error {
+// Validate validates User
+func (r User) Validate() error {
 	if utf8.RuneCountInString(r.Name) < 3 {
 		return fmt.Errorf("field Name is shorter than 3 chars")
 	}
@@ -264,8 +229,4 @@ func (r User) validate() error {
 		}
 	}
 	return nil
-}
-
-func (r User) Validate() error {
-	return r.validate()
 }

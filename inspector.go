@@ -12,16 +12,23 @@ import (
 	"github.com/gojuno/genval/types"
 )
 
+const (
+	validationMethod           = "Validate"
+	additionalValidationMethod = "validate"
+)
+
 type inspector struct {
-	structs          []StructDef
-	publicValidators map[string]bool
-	enums            map[string][]string
+	structs               []StructDef
+	overridenValidations  map[string]bool
+	additionalValidations map[string]bool
+	enums                 map[string][]string
 }
 
 func NewInspector() *inspector {
 	return &inspector{
-		publicValidators: make(map[string]bool),
-		enums:            make(map[string][]string),
+		overridenValidations:  make(map[string]bool),
+		additionalValidations: make(map[string]bool),
+		enums: make(map[string][]string),
 	}
 }
 
@@ -43,8 +50,11 @@ func (insp *inspector) Inspect(dir, outputFile string) error {
 func (insp *inspector) Result() []StructDef {
 	res := insp.structs
 	for i, s := range res {
-		if v, ok := insp.publicValidators[s.Name]; ok {
-			res[i].PublicValidatorExist = v
+		if v, ok := insp.overridenValidations[s.Name]; ok {
+			res[i].HasOverridenValidation = v
+		}
+		if v, ok := insp.additionalValidations[s.Name]; ok {
+			res[i].HasAdditionalValidation = v
 		}
 		if v, ok := insp.enums[s.Name]; ok {
 			res[i].EnumValues = v
@@ -78,12 +88,20 @@ func (insp *inspector) Visit(node ast.Node) ast.Visitor {
 		return nil
 	case *ast.FuncDecl: //To check if Validate() method already exist
 		methodName := spec.Name.Name
-		if methodName == "Validate" && spec.Recv != nil {
+		if methodName == validationMethod && spec.Recv != nil {
 			st := spec.Recv.List[0].Type
 			if x, ok := st.(*ast.Ident); ok {
-				insp.publicValidators[x.Name] = true
+				insp.overridenValidations[x.Name] = true
 			} else {
-				log.Fatalf("method Validate should be: 'func (s Struct)Validate() error{...}' not on pointer, %+v,%T", st, st)
+				log.Fatalf("method %v must have value receiver, %+v,%T", methodName, st, st)
+			}
+		}
+		if methodName == additionalValidationMethod && spec.Recv != nil {
+			st := spec.Recv.List[0].Type
+			if x, ok := st.(*ast.Ident); ok {
+				insp.additionalValidations[x.Name] = true
+			} else {
+				log.Fatalf("method %v must have value receiver, %+v,%T", methodName, st, st)
 			}
 		}
 		return nil
