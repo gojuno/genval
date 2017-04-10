@@ -118,3 +118,17 @@ func (r Request4) Validate() error {
 	}
 	return nil
 }
+
+// Validate validates Request5
+func (r Request5) Validate() error {
+	if err := r.Age.Validate(); err != nil {
+		return err
+	}
+	if r.Some < 3 {
+		return fmt.Errorf("field Some is less than 3 ")
+	}
+	if r.Some > 64 {
+		return fmt.Errorf("field Some is more than 64 ")
+	}
+	return r.validate()
+}
