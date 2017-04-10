@@ -164,9 +164,9 @@ func (insp *inspector) visitStruct(astTypeSpec *ast.TypeSpec) {
 		insp.addStruct(NewAliasStruct(structName, aliasType))
 
 	case *ast.StarExpr: //aliases
-		//log.Fatalf("can not use alias on pointer with genval (because can not use pointer type as a receiver): %s, %+v: %T", structName, astTypeSpec, v)
+		log.Fatalf("can not use alias on pointer with genval (because can not use pointer type as a receiver): %s, %+v: %T", structName, astTypeSpec, v)
 	case *ast.InterfaceType: //aliases
-		//log.Fatalf("can not use alias on interface with genval (because can not use interface type as a receiver): %s, %+v: %T", structName, astTypeSpec, v)
+		log.Fatalf("can not use alias on interface with genval (because can not use interface type as a receiver): %s, %+v: %T", structName, astTypeSpec, v)
 
 	default:
 		log.Fatalf("not expected Type for typeSpec: %s, %+v: %T", structName, astTypeSpec, astTypeSpec.Type)
