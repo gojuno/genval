@@ -10,20 +10,19 @@ import (
 	"unicode/utf8"
 )
 
-type Validatable interface {
+type validatable interface {
 	Validate() error
 }
 
-func callValidateIfValidatable(i interface{}) error {
-	if v, ok := i.(Validatable); ok {
-		if err := v.Validate(); err != nil {
-			return err
-		}
+func validate(i interface{}) error {
+	if v, ok := i.(validatable); ok {
+		return v.Validate()
 	}
 	return nil
 }
 
-func (r Dog) validate() error {
+// Validate validates Dog
+func (r Dog) Validate() error {
 	if utf8.RuneCountInString(r.Name) < 1 {
 		return fmt.Errorf("field Name is shorter than 1 chars")
 	}
@@ -33,11 +32,8 @@ func (r Dog) validate() error {
 	return nil
 }
 
-func (r Dog) Validate() error {
-	return r.validate()
-}
-
-func (r User) validate() error {
+// Validate validates User
+func (r User) Validate() error {
 	if utf8.RuneCountInString(r.Name) < 3 {
 		return fmt.Errorf("field Name is shorter than 3 chars")
 	}
@@ -67,8 +63,4 @@ func (r User) validate() error {
 		}
 	}
 	return nil
-}
-
-func (r User) Validate() error {
-	return r.validate()
 }
