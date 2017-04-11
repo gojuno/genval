@@ -4,7 +4,8 @@ import "testing"
 
 func TestMain(t *testing.T) {
 
-	mainLogic("examples/simple", "validators.go", true)
-	mainLogic("examples/complicated", "validators.go", true)
-	mainLogic("examples/overriding", "validators.go", true)
+	exc := `(client\.go|client_mock\.go)`
+	mainLogic(inspectorConfig{"examples/simple", "validators.go", exc}, true)
+	mainLogic(inspectorConfig{"examples/complicated", "validators.go", exc}, true)
+	mainLogic(inspectorConfig{"examples/overriding", "validators.go", exc}, true)
 }
