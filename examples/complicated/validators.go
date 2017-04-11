@@ -2,7 +2,7 @@
 //Please don't modify it manually. Edit your entity tags and then
 //run go generate
 
-package compilcated
+package complicated
 
 import (
 	"fmt"
