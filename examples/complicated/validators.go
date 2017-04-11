@@ -228,5 +228,8 @@ func (r User) Validate() error {
 			}
 		}
 	}
+	for _, x := range r.ByteArray {
+		_ = x
+	}
 	return nil
 }

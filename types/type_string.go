@@ -5,6 +5,8 @@ import (
 	"io"
 )
 
+const String string = "string"
+
 func NewString() *typeString {
 	return &typeString{}
 }
@@ -15,7 +17,7 @@ type typeString struct {
 }
 
 func (t typeString) Type() string {
-	return "string"
+	return String
 }
 
 func (t *typeString) SetTag(tag Tag) error {

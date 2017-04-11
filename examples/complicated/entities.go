@@ -28,6 +28,8 @@ type User struct {
 	MapOfMap                       map[string]map[int]string `validate:"value=[min_items=1,value=[min_len=3]]"`
 	FuncField                      func(int) string
 	ChanField                      <-chan int
+	ByteField                      byte
+	ByteArray                      []byte
 }
 
 func validateSome(i interface{}) error {

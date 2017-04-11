@@ -214,14 +214,16 @@ func isSimple(fieldType string) bool {
 
 func getSimpleType(fieldType string) types.TypeDef {
 	switch fieldType {
-	case "string":
+	case types.String:
 		return types.NewString()
 	case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64":
 		return types.NewNumber(fieldType)
 	case "float32", "float64":
 		return types.NewNumber(fieldType)
-	case "bool":
+	case types.Bool:
 		return types.NewBool()
+	case types.Byte:
+		return types.NewByte()
 	}
 	return nil
 }
