@@ -27,7 +27,7 @@ type inspector struct {
 
 type config struct {
 	dir              string
-	pkg string
+	pkg              string
 	outputFile       string
 	excludeRegexpStr string
 }
