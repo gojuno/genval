@@ -7,10 +7,10 @@ import (
 	"go/token"
 	"io/ioutil"
 	"log"
+	"regexp"
 	"strings"
 
 	"github.com/gojuno/genval/types"
-	"regexp"
 )
 
 const (
@@ -25,8 +25,9 @@ type inspector struct {
 	enums                 map[string][]string
 }
 
-type inspectorConfig struct {
+type config struct {
 	dir              string
+	pkg string
 	outputFile       string
 	excludeRegexpStr string
 }
@@ -39,7 +40,7 @@ func NewInspector() *inspector {
 	}
 }
 
-func (insp *inspector) Inspect(cfg inspectorConfig) error {
+func (insp *inspector) Inspect(cfg config) error {
 	files, err := getFilesForInspect(cfg)
 	if err != nil {
 		return err
@@ -70,9 +71,9 @@ func (insp *inspector) Result() []StructDef {
 	return res
 }
 
-func getFilesForInspect(cfg inspectorConfig) ([]string, error) {
+func getFilesForInspect(cfg config) ([]string, error) {
 	dir := cfg.dir
-	if strings.HasPrefix(cfg.dir, "/") {
+	if strings.HasPrefix(dir, "/") {
 		dir = "." + dir
 	}
 	var result []string
