@@ -9,6 +9,10 @@ import (
 	"log"
 )
 
+const (
+	version = "1.0"
+)
+
 func main() {
 	outputFilePtr := flag.String("outputFile", "validators.go", "output file name")
 	dirPtr := flag.String("d", "api", "directory with files to be validated")
