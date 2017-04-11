@@ -7,6 +7,7 @@ import (
 	"go/token"
 	"io/ioutil"
 	"log"
+	"regexp"
 	"strings"
 
 	"github.com/gojuno/genval/types"
@@ -24,6 +25,13 @@ type inspector struct {
 	enums                 map[string][]string
 }
 
+type config struct {
+	dir              string
+	pkg              string
+	outputFile       string
+	excludeRegexpStr string
+}
+
 func NewInspector() *inspector {
 	return &inspector{
 		overridenValidations:  make(map[string]bool),
@@ -32,8 +40,8 @@ func NewInspector() *inspector {
 	}
 }
 
-func (insp *inspector) Inspect(dir, outputFile string) error {
-	files, err := getFilesForInspect(dir, outputFile)
+func (insp *inspector) Inspect(cfg config) error {
+	files, err := getFilesForInspect(cfg)
 	if err != nil {
 		return err
 	}
@@ -63,7 +71,8 @@ func (insp *inspector) Result() []StructDef {
 	return res
 }
 
-func getFilesForInspect(dir, outputFile string) ([]string, error) {
+func getFilesForInspect(cfg config) ([]string, error) {
+	dir := cfg.dir
 	if strings.HasPrefix(dir, "/") {
 		dir = "." + dir
 	}
@@ -72,8 +81,17 @@ func getFilesForInspect(dir, outputFile string) ([]string, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to read dir %s: %s", dir, err)
 	}
+	r, err := regexp.Compile(cfg.excludeRegexpStr)
+	if err != nil {
+		return nil, fmt.Errorf("failed to compile regexp %q for %q: %v", cfg.excludeRegexpStr, cfg.excludeRegexpStr, err)
+	}
 	for _, f := range files {
-		if f.IsDir() || f.Name() == outputFile || strings.HasSuffix(f.Name(), "_test.go") || !strings.HasSuffix(f.Name(), ".go") {
+		if f.IsDir() ||
+			f.Name() == cfg.outputFile ||
+			strings.HasSuffix(f.Name(), "_test.go") ||
+			!strings.HasSuffix(f.Name(), ".go") ||
+			r.MatchString(f.Name()) {
+
 			continue
 		}
 		result = append(result, dir+"/"+f.Name())

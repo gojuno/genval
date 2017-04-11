@@ -25,11 +25,7 @@ func NewGenerator(structs []StructDef) generator {
 	}
 }
 
-func (g generator) Generate(path, outputFile string, needCheck bool) error {
-	pkg := filepath.Base(path)
-	if pkg == "." {
-		pkg = "main"
-	}
+func (g generator) Generate(validatorsCfg config, needCheck bool) error {
 
 	cfg := types.GenConfig{
 		NeedValidatableCheck: needCheck,
@@ -38,7 +34,7 @@ func (g generator) Generate(path, outputFile string, needCheck bool) error {
 		},
 	}
 
-	buf, err := g.gen(pkg, cfg)
+	buf, err := g.gen(validatorsCfg.pkg, cfg)
 	if err != nil {
 		log.Fatalf("can't generate resulting source: %s", err)
 	}
@@ -48,7 +44,7 @@ func (g generator) Generate(path, outputFile string, needCheck bool) error {
 		log.Fatalf("source: %s\ncan't format resulting source: %s", buf.String(), err)
 	}
 
-	filepath := filepath.Join(path, outputFile)
+	filepath := filepath.Join(validatorsCfg.dir, validatorsCfg.outputFile)
 
 	f, err := os.Create(filepath)
 	if err != nil {

@@ -1,13 +1,12 @@
 package main
 
-//go:generate genval examples/simple
-//go:generate genval examples/overriding
-//go:generate genval examples/complicated
+//go:generate genval -d examples/simple -p simple
+//go:generate genval -d examples/overriding -p overriding
+//go:generate genval -d examples/complicated -p complicated
 
 import (
 	"flag"
 	"log"
-	"os"
 )
 
 const (
@@ -16,33 +15,33 @@ const (
 
 func main() {
 	outputFilePtr := flag.String("outputFile", "validators.go", "output file name")
+	dirPtr := flag.String("d", "api", "directory with files to be validated")
+	pkgPtr := flag.String("p", "api", "package with files to be validated")
 	needValidatableCheckPtr := flag.Bool("needValidatableCheck", true, "check struct on Validatable before calling Validate()")
+	excludeRegexp := flag.String("excludeRegexp", `(client\.go|client_mock\.go)`,
+		"regexp file names that generator should exclude, e.g. `(client\\.go|client_mock\\.go)`")
 
 	flag.Parse()
 
-	args := flag.Args()
-	if len(args) > 1 {
-		flag.PrintDefaults()
-		os.Exit(1)
-	}
-	dir := "api"
-	if len(args) == 1 {
-		dir = args[0]
+	cfg := config{
+		dir:              *dirPtr,
+		pkg:              *pkgPtr,
+		outputFile:       *outputFilePtr,
+		excludeRegexpStr: *excludeRegexp,
 	}
 
-	mainLogic(dir, *outputFilePtr, *needValidatableCheckPtr)
-
+	mainLogic(cfg, *needValidatableCheckPtr)
 }
 
-func mainLogic(dir string, outputFile string, needCheck bool) {
+func mainLogic(cfg config, needCheck bool) {
 	insp := NewInspector()
-	if err := insp.Inspect(dir, outputFile); err != nil {
-		log.Fatalf("unable to inspect structs for %q: %v", dir, err)
+	if err := insp.Inspect(cfg); err != nil {
+		log.Fatalf("unable to inspect structs for %q: %v", cfg.dir, err)
 	}
 
 	g := NewGenerator(insp.Result())
 
-	if err := g.Generate(dir, outputFile, needCheck); err != nil {
-		log.Fatalf("unable to generate validators for %q: %v", dir, err)
+	if err := g.Generate(cfg, needCheck); err != nil {
+		log.Fatalf("unable to generate validators for %q: %v", cfg.dir, err)
 	}
 }
