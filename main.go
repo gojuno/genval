@@ -10,6 +10,10 @@ import (
 	"os"
 )
 
+const (
+	version = "1.0"
+)
+
 func main() {
 	outputFilePtr := flag.String("outputFile", "validators.go", "output file name")
 	needValidatableCheckPtr := flag.Bool("needValidatableCheck", true, "check struct on Validatable before calling Validate()")
