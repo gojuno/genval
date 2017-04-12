@@ -5,6 +5,11 @@ import (
 	"unicode/utf8"
 )
 
+type InterfaceToSkip interface {
+	Method()
+	Can()
+}
+
 type User struct {
 	Name                           string  `validate:"min_len=3,max_len=64"`
 	LastName                       *string `validate:"nullable,min_len=1,max_len=5"`
