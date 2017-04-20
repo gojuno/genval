@@ -2,7 +2,7 @@ package main
 
 import "testing"
 
-func TestMain(m *testing.M) {
+func Test_Main(m *testing.T) {
 
 	exc := `(client\.go|client_mock\.go)`
 	generate(config{"examples/simple", "simple", "validators.go", exc}, true)
