@@ -42,7 +42,7 @@ func (r AliasFunc) Validate() error {
 // Validate validates AliasOnDogsMapAlias
 func (r AliasOnDogsMapAlias) Validate() error {
 	if err := DogsMapAlias(r).Validate(); err != nil {
-		return err
+		return fmt.Errorf("r is not valid: %v", err)
 	}
 	return nil
 }
@@ -69,7 +69,7 @@ func (r DogsMapAlias) Validate() error {
 		_ = k
 		_ = v
 		if err := v.Validate(); err != nil {
-			return err
+			return fmt.Errorf("v is not valid: %v", err)
 		}
 	}
 	return nil
@@ -126,15 +126,15 @@ func (r User) Validate() error {
 		return fmt.Errorf("field Float is more than 42.55 ")
 	}
 	if err := r.Dog.Validate(); err != nil {
-		return err
+		return fmt.Errorf("Dog is not valid: %v", err)
 	}
 	if r.DogPointer != nil {
 		if err := r.DogPointer.Validate(); err != nil {
-			return err
+			return fmt.Errorf("DogPointer is not valid: %v", err)
 		}
 	}
 	if err := r.DogOptional.ValidateOptional(); err != nil {
-		return err
+		return fmt.Errorf("DogOptional is not valid: %v", err)
 	}
 	if len(r.Urls) < 1 {
 		return fmt.Errorf("array Urls has less items than 1 ")
@@ -152,7 +152,7 @@ func (r User) Validate() error {
 		_ = x
 		if x != nil {
 			if err := x.Validate(); err != nil {
-				return err
+				return fmt.Errorf("x is not valid: %v", err)
 			}
 		}
 	}
@@ -168,7 +168,7 @@ func (r User) Validate() error {
 		}
 	}
 	if err := validateSome(r.Some); err != nil {
-		return err
+		return fmt.Errorf("Some is not valid: %v", err)
 	}
 	if len(r.SomeArray) < 1 {
 		return fmt.Errorf("array SomeArray has less items than 1 ")
@@ -176,7 +176,7 @@ func (r User) Validate() error {
 	for _, x := range r.SomeArray {
 		_ = x
 		if err := validateSome(x); err != nil {
-			return err
+			return fmt.Errorf("x is not valid: %v", err)
 		}
 	}
 	if len(r.Dict) < 2 {
@@ -199,20 +199,20 @@ func (r User) Validate() error {
 		_ = k
 		_ = v
 		if err := v.ValidateOptional(); err != nil {
-			return err
+			return fmt.Errorf("v is not valid: %v", err)
 		}
 		if err := validateMaxDogName(v); err != nil {
-			return err
+			return fmt.Errorf("v is not valid: %v", err)
 		}
 	}
 	if err := r.Alias.Validate(); err != nil {
-		return err
+		return fmt.Errorf("Alias is not valid: %v", err)
 	}
 	if err := r.AliasOnAlias.Validate(); err != nil {
-		return err
+		return fmt.Errorf("AliasOnAlias is not valid: %v", err)
 	}
 	if err := r.AliasOnAliasWithCustomValidate.ValidateAlias(); err != nil {
-		return err
+		return fmt.Errorf("AliasOnAliasWithCustomValidate is not valid: %v", err)
 	}
 	for k, v := range r.MapOfMap {
 		_ = k

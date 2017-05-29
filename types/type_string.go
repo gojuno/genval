@@ -40,7 +40,7 @@ func (t typeString) Generate(w io.Writer, cfg GenConfig, name Name) {
 			cfg.AddImport("fmt")
 			cfg.AddImport("unicode/utf8")
 			fmt.Fprintf(w, "if utf8.RuneCountInString(%s) < %s {\n", name.Full(), *t.minLen)
-			fmt.Fprintf(w, "	return fmt.Errorf(\"field %s is shorter than %s chars\" )\n", name.FieldName(), *t.minLen)
+			fmt.Fprintf(w, "	   return fmt.Errorf(\"field %s is shorter than %s chars\" )\n", name.FieldName(), *t.minLen)
 			fmt.Fprintf(w, "}\n")
 		}
 	}
@@ -48,7 +48,7 @@ func (t typeString) Generate(w io.Writer, cfg GenConfig, name Name) {
 		cfg.AddImport("fmt")
 		cfg.AddImport("unicode/utf8")
 		fmt.Fprintf(w, "if utf8.RuneCountInString(%s) > %s {\n", name.Full(), *t.maxLen)
-		fmt.Fprintf(w, "	return fmt.Errorf(\"field %s is longer than %s chars\" )\n", name.FieldName(), *t.maxLen)
+		fmt.Fprintf(w, "	   return fmt.Errorf(\"field %s is longer than %s chars\" )\n", name.FieldName(), *t.maxLen)
 		fmt.Fprintf(w, "}\n")
 	}
 }

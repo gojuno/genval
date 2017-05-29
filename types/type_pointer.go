@@ -41,7 +41,7 @@ func (t typePointer) Generate(w io.Writer, cfg GenConfig, name Name) {
 	} else {
 		cfg.AddImport("fmt")
 		fmt.Fprintf(w, "if %s == nil {\n", name.Full())
-		fmt.Fprintf(w, "	return fmt.Errorf(\"field %s is required, should not be nil\" )\n", name.FieldName())
+		fmt.Fprintf(w, "    return fmt.Errorf(\"field %s is required, should not be nil\" )\n", name.FieldName())
 		fmt.Fprintf(w, "}\n")
 		t.innerType.Generate(w, cfg, name.WithPointer())
 	}
