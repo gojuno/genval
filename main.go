@@ -1,8 +1,9 @@
 package main
 
-//go:generate genval -d examples/simple -p simple
-//go:generate genval -d examples/overriding -p overriding
-//go:generate genval -d examples/complicated -p complicated
+//go:generate ./genval -d examples/simple -p simple
+//go:generate ./genval -d examples/overriding -p overriding
+//go:generate ./genval -d examples/complicated -p complicated
+//go:generate ./genval -d examples/empty -p empty
 
 import (
 	"flag"
