@@ -93,11 +93,13 @@ func (g generator) genImports(w io.Writer, pkg string, needValidatable bool) {
 
 
         package {{ .Pkg }}
+    {{if .Imports}}
         import (
             {{ range $imp, $v := .Imports }}
                 "{{ $imp }}"
-            {{ end }}        
+            {{ end }}
         )
+    {{end}}
 	{{if .NeedValidatable}}  
         type validatable interface {
             Validate() error
