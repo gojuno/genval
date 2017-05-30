@@ -77,7 +77,7 @@ func (r Age5) Validate() error {
 // Validate validates Request2
 func (r Request2) Validate() error {
 	if err := r.Age.ValidateMin10(); err != nil {
-		return err
+		return fmt.Errorf("Age is not valid: %v", err)
 	}
 	if r.Some < 3 {
 		return fmt.Errorf("field Some is less than 3 ")
@@ -91,7 +91,7 @@ func (r Request2) Validate() error {
 // Validate validates Request3
 func (r Request3) Validate() error {
 	if err := validateMin10(r.Age); err != nil {
-		return err
+		return fmt.Errorf("Age is not valid: %v", err)
 	}
 	if r.Some < 3 {
 		return fmt.Errorf("field Some is less than 3 ")
@@ -105,10 +105,10 @@ func (r Request3) Validate() error {
 // Validate validates Request4
 func (r Request4) Validate() error {
 	if err := r.Age.ValidateMin10(); err != nil {
-		return err
+		return fmt.Errorf("Age is not valid: %v", err)
 	}
 	if err := validateMax128(r.Age); err != nil {
-		return err
+		return fmt.Errorf("Age is not valid: %v", err)
 	}
 	if r.Some < 3 {
 		return fmt.Errorf("field Some is less than 3 ")
@@ -122,7 +122,7 @@ func (r Request4) Validate() error {
 // Validate validates Request5
 func (r Request5) Validate() error {
 	if err := r.Age.Validate(); err != nil {
-		return err
+		return fmt.Errorf("Age is not valid: %v", err)
 	}
 	if r.Some < 3 {
 		return fmt.Errorf("field Some is less than 3 ")

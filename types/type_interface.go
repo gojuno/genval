@@ -31,8 +31,8 @@ func (t *typeInterface) SetTag(tag Tag) error {
 
 func (t typeInterface) Generate(w io.Writer, cfg GenConfig, name Name) {
 	for _, f := range t.funcs {
-		fmt.Fprintf(w, "if err:=%s(%s); err!=nil {\n", f, name.Full())
-		fmt.Fprintf(w, "    return err\n")
+		fmt.Fprintf(w, "if err := %s(%s); err != nil {\n", f, name.Full())
+		fmt.Fprintf(w, "    return fmt.Errorf(\"%s is not valid: %%v\", err)\n", name.FieldName())
 		fmt.Fprintf(w, "}\n")
 	}
 }

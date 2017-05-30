@@ -47,7 +47,7 @@ func (r User) Validate() error {
 		return fmt.Errorf("field Age is more than 95 ")
 	}
 	if err := r.Dog.Validate(); err != nil {
-		return err
+		return fmt.Errorf("Dog is not valid: %v", err)
 	}
 	if len(r.Emails) < 1 {
 		return fmt.Errorf("map Emails has less items than 1 ")
