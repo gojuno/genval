@@ -7,6 +7,7 @@ import (
 
 type ErrList []error
 
+// Error implements `error` interface
 func (e *ErrList) Error() string {
 	var buffer bytes.Buffer
 
