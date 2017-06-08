@@ -11,8 +11,11 @@ func (e *ErrList) Error() string {
 	var buffer bytes.Buffer
 
 	buffer.WriteString("[")
-	for _, err := range *e {
-		buffer.WriteString(fmt.Sprintf(`'%v' `, err))
+	for i, err := range *e {
+		buffer.WriteString(fmt.Sprintf("'%v'", err))
+		if i < len(*e)-1 {
+			buffer.WriteString(", ")
+		}
 	}
 	buffer.WriteString("]")
 

@@ -17,7 +17,7 @@ func Test_ErrList_Add(t *testing.T) {
 		errs1.Add(errors.New("a"))
 		errs1.Add(&errs2)
 
-		assert.Equal(t, `['a' 'b' 'c' ]`, errs1.Error())
+		assert.Equal(t, `['a', 'b', 'c']`, errs1.Error())
 	})
 
 	t.Run("ErrList nil", func(t *testing.T) {
@@ -26,7 +26,7 @@ func Test_ErrList_Add(t *testing.T) {
 		errs1.Add(errors.New("a"))
 		errs1.Add(&errs2)
 
-		assert.Equal(t, `['a' ]`, errs1.Error())
+		assert.Equal(t, `['a']`, errs1.Error())
 	})
 
 	t.Run("many errors", func(t *testing.T) {
@@ -55,6 +55,6 @@ func Test_ErrList_Add(t *testing.T) {
 
 		assert.Len(t, errs, 2)
 		assert.NotNil(t, errs)
-		assert.Equal(t, `['a' 'b' ]`, errs.Error())
+		assert.Equal(t, `['a', 'b']`, errs.Error())
 	})
 }
