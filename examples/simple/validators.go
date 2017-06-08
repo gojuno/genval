@@ -7,6 +7,8 @@ package simple
 import (
 	"fmt"
 
+	"github.com/gojuno/genval/errlist"
+
 	"unicode/utf8"
 )
 
@@ -23,44 +25,46 @@ func validate(i interface{}) error {
 
 // Validate validates Dog
 func (r Dog) Validate() error {
+	var errs errlist.ErrList
 	if utf8.RuneCountInString(r.Name) < 1 {
-		return fmt.Errorf("field Name is shorter than 1 chars")
+		errs.Add(fmt.Errorf("field Name is shorter than 1 chars"))
 	}
 	if utf8.RuneCountInString(r.Name) > 64 {
-		return fmt.Errorf("field Name is longer than 64 chars")
+		errs.Add(fmt.Errorf("field Name is longer than 64 chars"))
 	}
-	return nil
+	return &errs
 }
 
 // Validate validates User
 func (r User) Validate() error {
+	var errs errlist.ErrList
 	if utf8.RuneCountInString(r.Name) < 3 {
-		return fmt.Errorf("field Name is shorter than 3 chars")
+		errs.Add(fmt.Errorf("field Name is shorter than 3 chars"))
 	}
 	if utf8.RuneCountInString(r.Name) > 64 {
-		return fmt.Errorf("field Name is longer than 64 chars")
+		errs.Add(fmt.Errorf("field Name is longer than 64 chars"))
 	}
 	if r.Age < 18 {
-		return fmt.Errorf("field Age is less than 18 ")
+		errs.Add(fmt.Errorf("field Age is less than 18 "))
 	}
 	if r.Age > 95 {
-		return fmt.Errorf("field Age is more than 95 ")
+		errs.Add(fmt.Errorf("field Age is more than 95 "))
 	}
 	if err := r.Dog.Validate(); err != nil {
-		return fmt.Errorf("Dog is not valid: %v", err)
+		errs.Add(fmt.Errorf("Dog is not valid: %v", err))
 	}
 	if len(r.Emails) < 1 {
-		return fmt.Errorf("map Emails has less items than 1 ")
+		errs.Add(fmt.Errorf("map Emails has less items than 1 "))
 	}
 	for k, v := range r.Emails {
 		_ = k
 		_ = v
 		if k > 3 {
-			return fmt.Errorf("field k is more than 3 ")
+			errs.Add(fmt.Errorf("field k is more than 3 "))
 		}
 		if utf8.RuneCountInString(v) < 5 {
-			return fmt.Errorf("field v is shorter than 5 chars")
+			errs.Add(fmt.Errorf("field v is shorter than 5 chars"))
 		}
 	}
-	return nil
+	return &errs
 }

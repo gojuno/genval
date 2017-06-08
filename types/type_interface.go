@@ -33,7 +33,7 @@ func (t typeInterface) Generate(w io.Writer, cfg GenConfig, name Name) {
 	for _, f := range t.funcs {
 		cfg.AddImport("fmt")
 		fmt.Fprintf(w, "if err := %s(%s); err != nil {\n", f, name.Full())
-		fmt.Fprintf(w, "    return fmt.Errorf(\"%s is not valid: %%v\", err)\n", name.FieldName())
+		fmt.Fprintf(w, "    errs.Add(fmt.Errorf(\"%s is not valid: %%v\", err))\n", name.FieldName())
 		fmt.Fprintf(w, "}\n")
 	}
 }

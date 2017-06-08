@@ -36,13 +36,13 @@ func (t typeNumber) Generate(w io.Writer, cfg GenConfig, name Name) {
 	if t.min != nil {
 		cfg.AddImport("fmt")
 		fmt.Fprintf(w, "if %s < %s {\n", name.Full(), *t.min)
-		fmt.Fprintf(w, "	return fmt.Errorf(\"field %s is less than %s \" )\n", name.FieldName(), *t.min)
+		fmt.Fprintf(w, "	errs.Add(fmt.Errorf(\"field %s is less than %s \"))\n", name.FieldName(), *t.min)
 		fmt.Fprintf(w, "}\n")
 	}
 	if t.max != nil {
 		cfg.AddImport("fmt")
 		fmt.Fprintf(w, "if %s > %s {\n", name.Full(), *t.max)
-		fmt.Fprintf(w, "	return fmt.Errorf(\"field %s is more than %s \" )\n", name.FieldName(), *t.max)
+		fmt.Fprintf(w, "	errs.Add(fmt.Errorf(\"field %s is more than %s \"))\n", name.FieldName(), *t.max)
 		fmt.Fprintf(w, "}\n")
 	}
 }

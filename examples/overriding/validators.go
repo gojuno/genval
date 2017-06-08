@@ -6,6 +6,8 @@ package overriding
 
 import (
 	"fmt"
+
+	"github.com/gojuno/genval/errlist"
 )
 
 type validatable interface {
@@ -21,114 +23,123 @@ func validate(i interface{}) error {
 
 // Validate validates Age1
 func (r Age1) Validate() error {
+	var errs errlist.ErrList
 	if r.Value < 3 {
-		return fmt.Errorf("field Value is less than 3 ")
+		errs.Add(fmt.Errorf("field Value is less than 3 "))
 	}
 	if r.Value > 64 {
-		return fmt.Errorf("field Value is more than 64 ")
+		errs.Add(fmt.Errorf("field Value is more than 64 "))
 	}
-	return nil
+	return &errs
 }
 
 // Validate validates Age2
 func (r Age2) Validate() error {
+	var errs errlist.ErrList
 	if r.Value < 3 {
-		return fmt.Errorf("field Value is less than 3 ")
+		errs.Add(fmt.Errorf("field Value is less than 3 "))
 	}
 	if r.Value > 64 {
-		return fmt.Errorf("field Value is more than 64 ")
+		errs.Add(fmt.Errorf("field Value is more than 64 "))
 	}
-	return nil
+	return &errs
 }
 
 // Validate validates Age3
 func (r Age3) Validate() error {
+	var errs errlist.ErrList
 	if r.Value < 3 {
-		return fmt.Errorf("field Value is less than 3 ")
+		errs.Add(fmt.Errorf("field Value is less than 3 "))
 	}
 	if r.Value > 64 {
-		return fmt.Errorf("field Value is more than 64 ")
+		errs.Add(fmt.Errorf("field Value is more than 64 "))
 	}
-	return nil
+	return &errs
 }
 
 // Validate validates Age4
 func (r Age4) Validate() error {
+	var errs errlist.ErrList
 	if r.Value < 3 {
-		return fmt.Errorf("field Value is less than 3 ")
+		errs.Add(fmt.Errorf("field Value is less than 3 "))
 	}
 	if r.Value > 64 {
-		return fmt.Errorf("field Value is more than 64 ")
+		errs.Add(fmt.Errorf("field Value is more than 64 "))
 	}
-	return nil
+	return &errs
 }
 
 // Validate validates Age5
 func (r Age5) Validate() error {
+	var errs errlist.ErrList
 	if r.Value < 3 {
-		return fmt.Errorf("field Value is less than 3 ")
+		errs.Add(fmt.Errorf("field Value is less than 3 "))
 	}
 	if r.Value > 64 {
-		return fmt.Errorf("field Value is more than 64 ")
+		errs.Add(fmt.Errorf("field Value is more than 64 "))
 	}
-	return nil
+	return &errs
 }
 
 // Validate validates Request2
 func (r Request2) Validate() error {
+	var errs errlist.ErrList
 	if err := r.Age.ValidateMin10(); err != nil {
-		return fmt.Errorf("Age is not valid: %v", err)
+		errs.Add(fmt.Errorf("Age is not valid: %v", err))
 	}
 	if r.Some < 3 {
-		return fmt.Errorf("field Some is less than 3 ")
+		errs.Add(fmt.Errorf("field Some is less than 3 "))
 	}
 	if r.Some > 64 {
-		return fmt.Errorf("field Some is more than 64 ")
+		errs.Add(fmt.Errorf("field Some is more than 64 "))
 	}
-	return nil
+	return &errs
 }
 
 // Validate validates Request3
 func (r Request3) Validate() error {
+	var errs errlist.ErrList
 	if err := validateMin10(r.Age); err != nil {
-		return fmt.Errorf("Age is not valid: %v", err)
+		errs.Add(fmt.Errorf("Age is not valid: %v", err))
 	}
 	if r.Some < 3 {
-		return fmt.Errorf("field Some is less than 3 ")
+		errs.Add(fmt.Errorf("field Some is less than 3 "))
 	}
 	if r.Some > 64 {
-		return fmt.Errorf("field Some is more than 64 ")
+		errs.Add(fmt.Errorf("field Some is more than 64 "))
 	}
-	return nil
+	return &errs
 }
 
 // Validate validates Request4
 func (r Request4) Validate() error {
+	var errs errlist.ErrList
 	if err := r.Age.ValidateMin10(); err != nil {
-		return fmt.Errorf("Age is not valid: %v", err)
+		errs.Add(fmt.Errorf("Age is not valid: %v", err))
 	}
 	if err := validateMax128(r.Age); err != nil {
-		return fmt.Errorf("Age is not valid: %v", err)
+		errs.Add(fmt.Errorf("Age is not valid: %v", err))
 	}
 	if r.Some < 3 {
-		return fmt.Errorf("field Some is less than 3 ")
+		errs.Add(fmt.Errorf("field Some is less than 3 "))
 	}
 	if r.Some > 64 {
-		return fmt.Errorf("field Some is more than 64 ")
+		errs.Add(fmt.Errorf("field Some is more than 64 "))
 	}
-	return nil
+	return &errs
 }
 
 // Validate validates Request5
 func (r Request5) Validate() error {
+	var errs errlist.ErrList
 	if err := r.Age.Validate(); err != nil {
-		return fmt.Errorf("Age is not valid: %v", err)
+		errs.Add(fmt.Errorf("Age is not valid: %v", err))
 	}
 	if r.Some < 3 {
-		return fmt.Errorf("field Some is less than 3 ")
+		errs.Add(fmt.Errorf("field Some is less than 3 "))
 	}
 	if r.Some > 64 {
-		return fmt.Errorf("field Some is more than 64 ")
+		errs.Add(fmt.Errorf("field Some is more than 64 "))
 	}
-	return r.validate()
+	return errs.Add(r.validate())
 }

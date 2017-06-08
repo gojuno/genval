@@ -45,14 +45,14 @@ func (t typeArray) Generate(w io.Writer, cfg GenConfig, name Name) {
 		if *t.min != "0" {
 			cfg.AddImport("fmt")
 			fmt.Fprintf(w, "if len(%s) < %s {\n", name.Full(), *t.min)
-			fmt.Fprintf(w, "    return fmt.Errorf(\"array %s has less items than %s \" )\n", name.FieldName(), *t.min)
+			fmt.Fprintf(w, "    errs.Add(fmt.Errorf(\"array %s has less items than %s \"))\n", name.FieldName(), *t.min)
 			fmt.Fprintf(w, "}\n")
 		}
 	}
 	if t.max != nil {
 		cfg.AddImport("fmt")
 		fmt.Fprintf(w, "if len(%s) > %s {\n", name.Full(), *t.max)
-		fmt.Fprintf(w, "    return fmt.Errorf(\"array %s has more items than %s \" )\n", name.FieldName(), *t.max)
+		fmt.Fprintf(w, "    errs.Add(fmt.Errorf(\"array %s has more items than %s \"))\n", name.FieldName(), *t.max)
 		fmt.Fprintf(w, "}\n")
 	}
 	fmt.Fprintf(w, "for _, x := range %s {\n", name.Full())
