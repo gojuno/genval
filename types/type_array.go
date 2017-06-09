@@ -5,6 +5,8 @@ import (
 	"io"
 )
 
+const Array string = "array"
+
 func NewArray(inner TypeDef) *typeArray {
 	return &typeArray{innerType: inner}
 }
@@ -16,7 +18,7 @@ type typeArray struct {
 }
 
 func (t typeArray) Type() string {
-	return t.innerType.Type()
+	return Array
 }
 
 func (t *typeArray) SetTag(tag Tag) error {
@@ -43,21 +45,22 @@ func (t *typeArray) SetTag(tag Tag) error {
 func (t typeArray) Generate(w io.Writer, cfg GenConfig, name Name) {
 	if t.min != nil {
 		if *t.min != "0" {
-			cfg.AddImport("fmt")
 			fmt.Fprintf(w, "if len(%s) < %s {\n", name.Full(), *t.min)
-			fmt.Fprintf(w, "    errs.Add(fmt.Errorf(\"array %s has less items than %s \"))\n", name.FieldName(), *t.min)
+			fmt.Fprintf(w, "    errs.AddFieldErrf(%s, \"less items than %s\")\n", name.LabelName(), *t.min)
 			fmt.Fprintf(w, "}\n")
 		}
 	}
 	if t.max != nil {
-		cfg.AddImport("fmt")
 		fmt.Fprintf(w, "if len(%s) > %s {\n", name.Full(), *t.max)
-		fmt.Fprintf(w, "    errs.Add(fmt.Errorf(\"array %s has more items than %s \"))\n", name.FieldName(), *t.max)
+		fmt.Fprintf(w, "    errs.AddFieldErrf(%s, \"more items than %s\")\n", name.LabelName(), *t.max)
 		fmt.Fprintf(w, "}\n")
 	}
-	fmt.Fprintf(w, "for _, x := range %s {\n", name.Full())
+	fmt.Fprintf(w, "for i, x := range %s {\n", name.Full())
+	fmt.Fprintf(w, "	_ = i \n")
 	fmt.Fprintf(w, "	_ = x \n")
-	t.innerType.Generate(w, cfg, NewSimpleName("x"))
+
+	cfg.AddImport("fmt")
+	t.innerType.Generate(w, cfg, NewIndexedName(name.FieldName(), "i", "x"))
 	fmt.Fprintf(w, "}\n")
 }
 

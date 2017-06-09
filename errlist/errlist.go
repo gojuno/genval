@@ -13,7 +13,7 @@ func (e *ErrList) Error() string {
 
 	buffer.WriteString("[")
 	for i, err := range *e {
-		buffer.WriteString(fmt.Sprintf("'%v'", err))
+		buffer.WriteString(err.Error())
 		if i < len(*e)-1 {
 			buffer.WriteString(", ")
 		}
@@ -35,4 +35,16 @@ func (e *ErrList) Add(err error) *ErrList {
 
 	*e = append(*e, err)
 	return e
+}
+
+func (e *ErrList) Addf(msg string, args ...interface{}) *ErrList {
+	return e.Add(fmt.Errorf(msg, args...))
+}
+
+func (e *ErrList) AddFieldErrf(field, msg string, args ...interface{}) *ErrList {
+	return e.Add(NewFieldErr(field, msg, args...))
+}
+
+func (e *ErrList) AddFieldErr(field string, err error) *ErrList {
+	return e.Add(&FieldErr{Field: field, Err: err})
 }
