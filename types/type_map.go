@@ -5,6 +5,8 @@ import (
 	"io"
 )
 
+const Map string = "map"
+
 func NewMap(key, value TypeDef) *typeMap {
 	return &typeMap{key: key, value: value}
 }
@@ -17,7 +19,7 @@ type typeMap struct {
 }
 
 func (t typeMap) Type() string {
-	return "map"
+	return Map
 }
 
 func (t *typeMap) SetTag(tag Tag) error {
@@ -51,23 +53,23 @@ func (t *typeMap) SetTag(tag Tag) error {
 func (t typeMap) Generate(w io.Writer, cfg GenConfig, name Name) {
 	if t.min != nil {
 		if *t.min != "0" {
-			cfg.AddImport("fmt")
 			fmt.Fprintf(w, "if len(%s) < %s {\n", name.Full(), *t.min)
-			fmt.Fprintf(w, "    return fmt.Errorf(\"map %s has less items than %s \" )\n", name.FieldName(), *t.min)
+			fmt.Fprintf(w, "    errs.AddFieldErrf(%s, \"less items than %s\")\n", name.LabelName(), *t.min)
 			fmt.Fprintf(w, "}\n")
 		}
 	}
 	if t.max != nil {
-		cfg.AddImport("fmt")
 		fmt.Fprintf(w, "if len(%s) > %s {\n", name.Full(), *t.max)
-		fmt.Fprintf(w, "    return fmt.Errorf(\"map %s has more items than %s \" )\n", name.FieldName(), *t.max)
+		fmt.Fprintf(w, "    errs.AddFieldErrf(%s, \"more items than %s\")\n", name.LabelName(), *t.max)
 		fmt.Fprintf(w, "}\n")
 	}
 	fmt.Fprintf(w, "for k, v := range %s {\n", name.Full())
 	fmt.Fprintf(w, "	_ = k \n")
 	fmt.Fprintf(w, "	_ = v \n")
-	t.key.Generate(w, cfg, NewSimpleName("k"))
-	t.value.Generate(w, cfg, NewSimpleName("v"))
+
+	cfg.AddImport("fmt")
+	t.key.Generate(w, cfg, NewIndexedName(name.FieldName(), "k", "k"))
+	t.value.Generate(w, cfg, NewIndexedName(name.FieldName(), "k", "v"))
 	fmt.Fprintf(w, "}\n")
 }
 

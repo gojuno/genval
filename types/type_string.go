@@ -37,18 +37,16 @@ func (t *typeString) SetTag(tag Tag) error {
 func (t typeString) Generate(w io.Writer, cfg GenConfig, name Name) {
 	if t.minLen != nil {
 		if *t.minLen != "0" {
-			cfg.AddImport("fmt")
 			cfg.AddImport("unicode/utf8")
 			fmt.Fprintf(w, "if utf8.RuneCountInString(%s) < %s {\n", name.Full(), *t.minLen)
-			fmt.Fprintf(w, "	   return fmt.Errorf(\"field %s is shorter than %s chars\" )\n", name.FieldName(), *t.minLen)
+			fmt.Fprintf(w, "	   errs.AddFieldErrf(%s, \"shorter than %s chars\")\n", name.LabelName(), *t.minLen)
 			fmt.Fprintf(w, "}\n")
 		}
 	}
 	if t.maxLen != nil {
-		cfg.AddImport("fmt")
 		cfg.AddImport("unicode/utf8")
 		fmt.Fprintf(w, "if utf8.RuneCountInString(%s) > %s {\n", name.Full(), *t.maxLen)
-		fmt.Fprintf(w, "	   return fmt.Errorf(\"field %s is longer than %s chars\" )\n", name.FieldName(), *t.maxLen)
+		fmt.Fprintf(w, "	   errs.AddFieldErrf(%s ,\"longer than %s chars\")\n", name.LabelName(), *t.maxLen)
 		fmt.Fprintf(w, "}\n")
 	}
 }

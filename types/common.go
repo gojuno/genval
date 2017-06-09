@@ -19,6 +19,7 @@ var ErrUnusedTag = errors.New("unused tag")
 
 type GenConfig struct {
 	NeedValidatableCheck bool
+	SeveralErrors        bool
 	AddImport            func(string)
 }
 
@@ -27,6 +28,7 @@ type Name struct {
 	pointerPrefix string
 	structVar     string
 	fieldName     string
+	labelName     string
 }
 
 func (n Name) Full() string {
@@ -48,11 +50,16 @@ func (n Name) FieldName() string {
 	return n.fieldName
 }
 
+func (n Name) LabelName() string {
+	return n.labelName
+}
+
 func NewName(pointerPrefix, structVar, fieldName string) Name {
 	return Name{
 		pointerPrefix: pointerPrefix,
 		structVar:     structVar,
 		fieldName:     fieldName,
+		labelName:     fmt.Sprintf("%q", fieldName),
 	}
 }
 func NewSimpleName(fieldName string) Name {
@@ -60,6 +67,15 @@ func NewSimpleName(fieldName string) Name {
 		pointerPrefix: "",
 		structVar:     "",
 		fieldName:     fieldName,
+		labelName:     fmt.Sprintf("%q", fieldName),
+	}
+}
+func NewIndexedName(fieldName, indexVar, validateVar string) Name {
+	return Name{
+		pointerPrefix: "",
+		structVar:     "",
+		fieldName:     validateVar,
+		labelName:     fmt.Sprintf("fmt.Sprintf(\"%s[%%v]\", %v)", fieldName, indexVar),
 	}
 }
 func NewSimpleNameWithAliasType(fieldName, aliasType string) Name {
@@ -68,6 +84,7 @@ func NewSimpleNameWithAliasType(fieldName, aliasType string) Name {
 		pointerPrefix: "",
 		structVar:     "",
 		fieldName:     fieldName,
+		labelName:     fmt.Sprintf("%q", fieldName),
 	}
 }
 
@@ -76,6 +93,7 @@ func (n Name) WithPointer() Name {
 		pointerPrefix: "*",
 		structVar:     n.structVar,
 		fieldName:     n.fieldName,
+		labelName:     n.labelName,
 	}
 }
 

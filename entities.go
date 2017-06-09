@@ -32,22 +32,54 @@ func (s StructDef) Generate(w io.Writer, cfg types.GenConfig) {
 		varName := "r"
 		fmt.Fprintf(w, "// Validate validates %s\n", s.Name)
 		fmt.Fprintf(w, "func (%s %s) Validate() error {\n", varName, s.Name)
-		switch {
-		case len(s.EnumValues) > 0:
-			s.generateEnumValidator(w, cfg, varName)
-		case s.aliasType != nil:
-			aliasType := *s.aliasType
-			aliasType.Generate(w, cfg, types.NewSimpleNameWithAliasType(varName, aliasType.Type()))
-		default:
-			for _, field := range s.fields {
-				field.fieldType.Generate(w, cfg, types.NewName("", varName+".", field.fieldName))
-			}
-		}
 
-		if s.HasAdditionalValidation {
-			fmt.Fprint(w, "    return r.validate()")
-		} else {
+		hasAnythingToValidate := (len(s.EnumValues) > 0) || s.aliasType != nil || len(s.fields) > 0 || s.HasAdditionalValidation
+		if !hasAnythingToValidate {
 			fmt.Fprintf(w, "	return nil\n")
+		} else {
+
+			endReturn := "	return nil\n"
+			if s.HasAdditionalValidation {
+				endReturn = "	return r.validate()\n"
+			}
+
+			switch {
+			case len(s.EnumValues) > 0:
+				s.generateEnumValidator(w, cfg, varName)
+			case s.aliasType != nil:
+				aliasType := *s.aliasType
+
+				cfg.SeveralErrors = aliasType.Type() == types.Map || aliasType.Type() == types.Array
+				if cfg.SeveralErrors {
+					cfg.AddImport("github.com/gojuno/genval/errlist")
+					fmt.Fprint(w, "	var errs errlist.ErrList\n")
+
+					endReturn = "	return &errs\n"
+					if s.HasAdditionalValidation {
+						endReturn = "	return errs.Add(r.validate())\n"
+					}
+				}
+
+				aliasType.Generate(w, cfg, types.NewSimpleNameWithAliasType(varName, aliasType.Type()))
+
+			default:
+				cfg.AddImport("github.com/gojuno/genval/errlist")
+				fmt.Fprint(w, "	var errs errlist.ErrList\n")
+
+				cfg.SeveralErrors = true
+
+				for _, field := range s.fields {
+					field.fieldType.Generate(w, cfg, types.NewName("", varName+".", field.fieldName))
+				}
+
+				endReturn = "	return &errs\n"
+				if s.HasAdditionalValidation {
+					endReturn = "	return errs.Add(r.validate())\n"
+				}
+			}
+
+			fmt.Fprint(w, endReturn)
+
 		}
 
 		fmt.Fprintf(w, "}\n\n")
@@ -62,7 +94,7 @@ func (s StructDef) generateEnumValidator(w io.Writer, cfg types.GenConfig, varNa
 		fmt.Fprintf(w, "case %v: \n", v)
 	}
 	fmt.Fprintf(w, "	default: \n")
-	fmt.Fprintf(w, "		return fmt.Errorf(\"invalid value for enum %v: %%v\", %s) \n", s.Name, varName)
+	fmt.Fprintf(w, "		return fmt.Errorf(\"invalid value for enum %v: %%v\", %s)\n", s.Name, varName)
 	fmt.Fprintf(w, "}\n")
 }
 
