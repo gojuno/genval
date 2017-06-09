@@ -8,13 +8,13 @@ import (
 type ErrList []error
 
 // Error implements `error` interface
-func (e *ErrList) Error() string {
+func (e ErrList) Error() string {
 	var buffer bytes.Buffer
 
 	buffer.WriteString("[")
-	for i, err := range *e {
+	for i, err := range e {
 		buffer.WriteString(err.Error())
-		if i < len(*e)-1 {
+		if i < len(e)-1 {
 			buffer.WriteString(", ")
 		}
 	}
@@ -46,5 +46,9 @@ func (e *ErrList) AddFieldErrf(field, msg string, args ...interface{}) *ErrList 
 }
 
 func (e *ErrList) AddFieldErr(field string, err error) *ErrList {
-	return e.Add(&FieldErr{Field: field, Err: err})
+	return e.Add(FieldErr{Field: field, Err: err.Error()})
+}
+
+func (e ErrList) HasErrors() bool {
+	return len(e) > 0
 }

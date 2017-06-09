@@ -32,7 +32,10 @@ func (r Dog) Validate() error {
 	if utf8.RuneCountInString(r.Name) > 64 {
 		errs.AddFieldErrf("Name", "longer than 64 chars")
 	}
-	return &errs
+	if errs.HasErrors() {
+		return errs
+	}
+	return nil
 }
 
 // Validate validates User
@@ -66,5 +69,8 @@ func (r User) Validate() error {
 			errs.AddFieldErrf(fmt.Sprintf("Emails[%v]", k), "shorter than 5 chars")
 		}
 	}
-	return &errs
+	if errs.HasErrors() {
+		return errs
+	}
+	return nil
 }

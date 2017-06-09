@@ -1,11 +1,13 @@
 package errlist
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_ErrList_Add(t *testing.T) {
@@ -59,4 +61,15 @@ func Test_ErrList_Add(t *testing.T) {
 		assert.NotNil(t, errs)
 		assert.Equal(t, `[a, b]`, errs.Error())
 	})
+}
+
+func Test_ErrList_Marshal(t *testing.T) {
+	var errs ErrList
+
+	errs.AddFieldErrf("x", "bla")
+	errs.AddFieldErrf("y", "poop")
+
+	res, err := json.Marshal(errs)
+	require.NoError(t, err)
+	assert.Equal(t, `[{"field":"x","err":"bla"},{"field":"y","err":"poop"}]`, string(res))
 }

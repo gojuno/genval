@@ -37,12 +37,6 @@ func (s StructDef) Generate(w io.Writer, cfg types.GenConfig) {
 		if !hasAnythingToValidate {
 			fmt.Fprintf(w, "	return nil\n")
 		} else {
-
-			endReturn := "	return nil\n"
-			if s.HasAdditionalValidation {
-				endReturn = "	return r.validate()\n"
-			}
-
 			switch {
 			case len(s.EnumValues) > 0:
 				s.generateEnumValidator(w, cfg, varName)
@@ -53,11 +47,6 @@ func (s StructDef) Generate(w io.Writer, cfg types.GenConfig) {
 				if cfg.SeveralErrors {
 					cfg.AddImport("github.com/gojuno/genval/errlist")
 					fmt.Fprint(w, "	var errs errlist.ErrList\n")
-
-					endReturn = "	return &errs\n"
-					if s.HasAdditionalValidation {
-						endReturn = "	return errs.Add(r.validate())\n"
-					}
 				}
 
 				aliasType.Generate(w, cfg, types.NewSimpleNameWithAliasType(varName, aliasType.Type()))
@@ -71,15 +60,22 @@ func (s StructDef) Generate(w io.Writer, cfg types.GenConfig) {
 				for _, field := range s.fields {
 					field.fieldType.Generate(w, cfg, types.NewName("", varName+".", field.fieldName))
 				}
+			}
 
-				endReturn = "	return &errs\n"
-				if s.HasAdditionalValidation {
-					endReturn = "	return errs.Add(r.validate())\n"
+			if s.HasAdditionalValidation {
+				if cfg.SeveralErrors {
+					fmt.Fprintf(w, "	errs.Add(r.validate())\n")
+				} else {
+					fmt.Fprintf(w, "	return r.validate()\n")
 				}
 			}
 
-			fmt.Fprint(w, endReturn)
-
+			if cfg.SeveralErrors {
+				fmt.Fprintf(w, "	if errs.HasErrors() {\n")
+				fmt.Fprintf(w, "		return errs\n")
+				fmt.Fprintf(w, "	}\n")
+			}
+			fmt.Fprintf(w, "	return nil\n")
 		}
 
 		fmt.Fprintf(w, "}\n\n")

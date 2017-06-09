@@ -28,7 +28,10 @@ func (r Age1) Validate() error {
 	if r.Value > 64 {
 		errs.AddFieldErrf("Value", "more than 64")
 	}
-	return &errs
+	if errs.HasErrors() {
+		return errs
+	}
+	return nil
 }
 
 // Validate validates Age2
@@ -40,7 +43,10 @@ func (r Age2) Validate() error {
 	if r.Value > 64 {
 		errs.AddFieldErrf("Value", "more than 64")
 	}
-	return &errs
+	if errs.HasErrors() {
+		return errs
+	}
+	return nil
 }
 
 // Validate validates Age3
@@ -52,7 +58,10 @@ func (r Age3) Validate() error {
 	if r.Value > 64 {
 		errs.AddFieldErrf("Value", "more than 64")
 	}
-	return &errs
+	if errs.HasErrors() {
+		return errs
+	}
+	return nil
 }
 
 // Validate validates Age4
@@ -64,7 +73,10 @@ func (r Age4) Validate() error {
 	if r.Value > 64 {
 		errs.AddFieldErrf("Value", "more than 64")
 	}
-	return &errs
+	if errs.HasErrors() {
+		return errs
+	}
+	return nil
 }
 
 // Validate validates Age5
@@ -76,7 +88,10 @@ func (r Age5) Validate() error {
 	if r.Value > 64 {
 		errs.AddFieldErrf("Value", "more than 64")
 	}
-	return &errs
+	if errs.HasErrors() {
+		return errs
+	}
+	return nil
 }
 
 // Validate validates Request2
@@ -91,7 +106,10 @@ func (r Request2) Validate() error {
 	if r.Some > 64 {
 		errs.AddFieldErrf("Some", "more than 64")
 	}
-	return &errs
+	if errs.HasErrors() {
+		return errs
+	}
+	return nil
 }
 
 // Validate validates Request3
@@ -106,7 +124,10 @@ func (r Request3) Validate() error {
 	if r.Some > 64 {
 		errs.AddFieldErrf("Some", "more than 64")
 	}
-	return &errs
+	if errs.HasErrors() {
+		return errs
+	}
+	return nil
 }
 
 // Validate validates Request4
@@ -124,7 +145,10 @@ func (r Request4) Validate() error {
 	if r.Some > 64 {
 		errs.AddFieldErrf("Some", "more than 64")
 	}
-	return &errs
+	if errs.HasErrors() {
+		return errs
+	}
+	return nil
 }
 
 // Validate validates Request5
@@ -139,5 +163,9 @@ func (r Request5) Validate() error {
 	if r.Some > 64 {
 		errs.AddFieldErrf("Some", "more than 64")
 	}
-	return errs.Add(r.validate())
+	errs.Add(r.validate())
+	if errs.HasErrors() {
+		return errs
+	}
+	return nil
 }

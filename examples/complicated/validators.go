@@ -30,7 +30,10 @@ func (r AliasArray) Validate() error {
 		_ = i
 		_ = x
 	}
-	return &errs
+	if errs.HasErrors() {
+		return errs
+	}
+	return nil
 }
 
 // Validate validates AliasChan
@@ -65,7 +68,10 @@ func (r Dog) Validate() error {
 	if utf8.RuneCountInString(r.Name) > 64 {
 		errs.AddFieldErrf("Name", "longer than 64 chars")
 	}
-	return &errs
+	if errs.HasErrors() {
+		return errs
+	}
+	return nil
 }
 
 // Validate validates DogsMapAlias
@@ -78,7 +84,10 @@ func (r DogsMapAlias) Validate() error {
 			errs.AddFieldErr(fmt.Sprintf("r[%v]", k), err)
 		}
 	}
-	return &errs
+	if errs.HasErrors() {
+		return errs
+	}
+	return nil
 }
 
 // Validate validates Status
@@ -243,5 +252,8 @@ func (r User) Validate() error {
 		_ = i
 		_ = x
 	}
-	return &errs
+	if errs.HasErrors() {
+		return errs
+	}
+	return nil
 }
