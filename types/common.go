@@ -54,12 +54,12 @@ func (n Name) LabelName() string {
 	return n.labelName
 }
 
-func NewName(pointerPrefix, structVar, fieldName string) Name {
+func NewName(pointerPrefix, structVar, fieldName, labelName string) Name {
 	return Name{
 		pointerPrefix: pointerPrefix,
 		structVar:     structVar,
 		fieldName:     fieldName,
-		labelName:     fmt.Sprintf("%q", fieldName),
+		labelName:     fmt.Sprintf("%q", labelName),
 	}
 }
 func NewSimpleName(fieldName string) Name {

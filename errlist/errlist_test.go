@@ -15,29 +15,38 @@ func Test_ErrList_Add(t *testing.T) {
 
 	t.Run("ErrList not nil", func(t *testing.T) {
 		var errs1, errs2 ErrList
-		errs2.Add(errors.New("b"))
-		errs2.Add(errors.New("c"))
+		errs2.AddFieldErr("2", errors.New("b"))
+		errs2.AddFieldErr("3", errors.New("c"))
 
-		errs1.Add(errors.New("a"))
-		errs1.Add(&errs2)
+		errs1.AddFieldErr("1", errors.New("a"))
+		errs1.Add(errs2)
 
-		assert.Equal(t, `[a, b, c]`, errs1.Error())
+		assert.Equal(t, `[1: a, 2: b, 3: c]`, errs1.Error())
 	})
 
 	t.Run("ErrList nil", func(t *testing.T) {
-		var errs1, errs2 ErrList
+		var errs1 ErrList
 
-		errs1.Add(errors.New("a"))
-		errs1.Add(&errs2)
+		errs1.AddFieldErr("1", errors.New("a"))
+		errs1.Add(nil)
 
-		assert.Equal(t, `[a]`, errs1.Error())
+		assert.Equal(t, `[1: a]`, errs1.Error())
+	})
+
+	t.Run("unkown field", func(t *testing.T) {
+		var errs1 ErrList
+
+		errs1.AddFieldErr("1", errors.New("a"))
+		errs1.Add(errors.New("b"))
+
+		assert.Equal(t, `[1: a, unknown: b]`, errs1.Error())
 	})
 
 	t.Run("many errors", func(t *testing.T) {
 		var errs ErrList
 
 		for i := 0; i < 100; i++ {
-			errs.Add(fmt.Errorf("%d", i))
+			errs.AddFieldErrf("a", fmt.Sprintf("%d", i))
 		}
 
 		assert.Len(t, errs, 100)
@@ -45,7 +54,7 @@ func Test_ErrList_Add(t *testing.T) {
 
 	t.Run("nil", func(t *testing.T) {
 		var errs ErrList
-		errs.Add(nil)
+		errs.AddFieldErr("a", nil)
 		assert.Len(t, errs, 0)
 		assert.Nil(t, errs)
 		assert.Equal(t, `[]`, errs.Error())
@@ -54,12 +63,12 @@ func Test_ErrList_Add(t *testing.T) {
 	t.Run("normal", func(t *testing.T) {
 		var errs ErrList
 
-		errs.Add(errors.New("a"))
-		errs.Add(errors.New("b"))
+		errs.AddFieldErr("1", errors.New("a"))
+		errs.AddFieldErr("2", errors.New("b"))
 
 		assert.Len(t, errs, 2)
 		assert.NotNil(t, errs)
-		assert.Equal(t, `[a, b]`, errs.Error())
+		assert.Equal(t, `[1: a, 2: b]`, errs.Error())
 	})
 }
 
@@ -71,5 +80,5 @@ func Test_ErrList_Marshal(t *testing.T) {
 
 	res, err := json.Marshal(errs)
 	require.NoError(t, err)
-	assert.Equal(t, `[{"field":"x","err":"bla"},{"field":"y","err":"poop"}]`, string(res))
+	assert.Equal(t, `[{"field":"x","error":"bla"},{"field":"y","error":"poop"}]`, string(res))
 }

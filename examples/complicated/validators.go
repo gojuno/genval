@@ -30,10 +30,7 @@ func (r AliasArray) Validate() error {
 		_ = i
 		_ = x
 	}
-	if errs.HasErrors() {
-		return errs
-	}
-	return nil
+	return errs.ErrorOrNil()
 }
 
 // Validate validates AliasChan
@@ -68,10 +65,7 @@ func (r Dog) Validate() error {
 	if utf8.RuneCountInString(r.Name) > 64 {
 		errs.AddFieldErrf("Name", "longer than 64 chars")
 	}
-	if errs.HasErrors() {
-		return errs
-	}
-	return nil
+	return errs.ErrorOrNil()
 }
 
 // Validate validates DogsMapAlias
@@ -84,10 +78,7 @@ func (r DogsMapAlias) Validate() error {
 			errs.AddFieldErr(fmt.Sprintf("r[%v]", k), err)
 		}
 	}
-	if errs.HasErrors() {
-		return errs
-	}
-	return nil
+	return errs.ErrorOrNil()
 }
 
 // Validate validates Status
@@ -114,10 +105,10 @@ func (r User) Validate() error {
 	}
 	if r.LastName != nil {
 		if utf8.RuneCountInString(*r.LastName) < 1 {
-			errs.AddFieldErrf("LastName", "shorter than 1 chars")
+			errs.AddFieldErrf("\"last_name\"", "shorter than 1 chars")
 		}
 		if utf8.RuneCountInString(*r.LastName) > 5 {
-			errs.AddFieldErrf("LastName", "longer than 5 chars")
+			errs.AddFieldErrf("\"last_name\"", "longer than 5 chars")
 		}
 	}
 	if r.Age < 18 {
@@ -127,13 +118,13 @@ func (r User) Validate() error {
 		errs.AddFieldErrf("Age", "more than 105")
 	}
 	if r.ChildrenCount == nil {
-		errs.AddFieldErrf("ChildrenCount", "cannot be nil")
+		errs.AddFieldErrf("\"children_count\"", "cannot be nil")
 	}
 	if *r.ChildrenCount < 0 {
-		errs.AddFieldErrf("ChildrenCount", "less than 0")
+		errs.AddFieldErrf("\"children_count\"", "less than 0")
 	}
 	if *r.ChildrenCount > 15 {
-		errs.AddFieldErrf("ChildrenCount", "more than 15")
+		errs.AddFieldErrf("\"children_count\"", "more than 15")
 	}
 	if r.Float < -4.22 {
 		errs.AddFieldErrf("Float", "less than -4.22")
@@ -252,8 +243,5 @@ func (r User) Validate() error {
 		_ = i
 		_ = x
 	}
-	if errs.HasErrors() {
-		return errs
-	}
-	return nil
+	return errs.ErrorOrNil()
 }

@@ -12,9 +12,9 @@ type InterfaceToSkip interface {
 
 type User struct {
 	Name                           string  `validate:"min_len=3,max_len=64"`
-	LastName                       *string `validate:"nullable,min_len=1,max_len=5"`
+	LastName                       *string `json:"last_name" validate:"nullable,min_len=1,max_len=5"`
 	Age                            uint    `validate:"min=18,max=105"`
-	ChildrenCount                  *int    `validate:"not_null,min=0,max=15"`
+	ChildrenCount                  *int    `json:"children_count" validate:"not_null,min=0,max=15"`
 	Float                          float64 `validate:"min=-4.22,max=42.55"`
 	Dog                            Dog
 	DogPointer                     *Dog

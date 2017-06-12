@@ -58,7 +58,7 @@ func (s StructDef) Generate(w io.Writer, cfg types.GenConfig) {
 				cfg.SeveralErrors = true
 
 				for _, field := range s.fields {
-					field.fieldType.Generate(w, cfg, types.NewName("", varName+".", field.fieldName))
+					field.fieldType.Generate(w, cfg, types.NewName("", varName+".", field.fieldName, field.jsonKey))
 				}
 			}
 
@@ -71,11 +71,10 @@ func (s StructDef) Generate(w io.Writer, cfg types.GenConfig) {
 			}
 
 			if cfg.SeveralErrors {
-				fmt.Fprintf(w, "	if errs.HasErrors() {\n")
-				fmt.Fprintf(w, "		return errs\n")
-				fmt.Fprintf(w, "	}\n")
+				fmt.Fprintf(w, "	return errs.ErrorOrNil()")
+			} else {
+				fmt.Fprintf(w, "	return nil\n")
 			}
-			fmt.Fprintf(w, "	return nil\n")
 		}
 
 		fmt.Fprintf(w, "}\n\n")
@@ -96,11 +95,19 @@ func (s StructDef) generateEnumValidator(w io.Writer, cfg types.GenConfig, varNa
 
 type FieldDef struct {
 	fieldName string
+	jsonKey   string
 	fieldType types.TypeDef
 }
 
 func NewField(fieldName string, fieldType types.TypeDef, tags []types.Tag) (*FieldDef, error) {
+	jsonKey := fieldName
+
 	for _, t := range tags {
+		if t.Key() == types.JSONTag {
+			jsonKey = t.(types.SimpleTag).Param
+			continue
+		}
+
 		if err := fieldType.SetTag(t); err != nil {
 			return nil, fmt.Errorf("set tags failed, field %s, tag: %+v, err: %s", fieldName, t, err)
 		}
@@ -110,6 +117,7 @@ func NewField(fieldName string, fieldType types.TypeDef, tags []types.Tag) (*Fie
 	}
 	return &FieldDef{
 		fieldName: fieldName,
+		jsonKey:   jsonKey,
 		fieldType: fieldType,
 	}, nil
 }

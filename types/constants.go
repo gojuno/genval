@@ -1,6 +1,9 @@
 package types
 
-const ValidateTag = "validate"
+const (
+	ValidateTag = "validate"
+	JSONTag     = "json"
+)
 
 const (
 	StringMinLenKey string = "min_len"
