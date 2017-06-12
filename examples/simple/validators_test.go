@@ -10,11 +10,14 @@ import (
 func Test_User_Validate(t *testing.T) {
 	t.Parallel()
 
+	title := None
+
 	validUser := User{
 		Name:   "Vasa",
 		Age:    20,
 		Dog:    Dog{Name: "Taksa"},
 		Emails: map[int]string{1: "vasa@gojuno.com"},
+		Title:  &title,
 	}
 
 	t.Run("valid", func(t *testing.T) {
@@ -29,6 +32,25 @@ func Test_User_Validate(t *testing.T) {
 			err := user.Validate()
 			require.NotNil(t, err)
 			assert.Equal(t, `[Name: shorter than 3 chars]`, err.Error())
+		})
+
+		t.Run("nil title", func(t *testing.T) {
+			user := validUser
+			user.Title = nil
+
+			err := user.Validate()
+			require.NotNil(t, err)
+			assert.Equal(t, "[Title: cannot be nil]", err.Error())
+		})
+
+		t.Run("bad title", func(t *testing.T) {
+			user := validUser
+			badTitle := Title("Jedi")
+			user.Title = &badTitle
+
+			err := user.Validate()
+			require.NotNil(t, err)
+			assert.Equal(t, "[Title: invalid value for enum Title: Jedi]", err.Error())
 		})
 
 		t.Run("no email", func(t *testing.T) {

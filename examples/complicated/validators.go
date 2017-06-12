@@ -119,12 +119,13 @@ func (r User) Validate() error {
 	}
 	if r.ChildrenCount == nil {
 		errs.AddFieldErrf("ChildrenCount", "cannot be nil")
-	}
-	if *r.ChildrenCount < 0 {
-		errs.AddFieldErrf("ChildrenCount", "less than 0")
-	}
-	if *r.ChildrenCount > 15 {
-		errs.AddFieldErrf("ChildrenCount", "more than 15")
+	} else {
+		if *r.ChildrenCount < 0 {
+			errs.AddFieldErrf("ChildrenCount", "less than 0")
+		}
+		if *r.ChildrenCount > 15 {
+			errs.AddFieldErrf("ChildrenCount", "more than 15")
+		}
 	}
 	if r.Float < -4.22 {
 		errs.AddFieldErrf("Float", "less than -4.22")

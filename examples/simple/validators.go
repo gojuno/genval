@@ -35,6 +35,19 @@ func (r Dog) Validate() error {
 	return errs.ErrorOrNil()
 }
 
+// Validate validates Title
+func (r Title) Validate() error {
+	switch r {
+	case None:
+	case Doctor:
+	case Sir:
+	case Father:
+	default:
+		return fmt.Errorf("invalid value for enum Title: %v", r)
+	}
+	return nil
+}
+
 // Validate validates User
 func (r User) Validate() error {
 	var errs errlist.ErrList
@@ -64,6 +77,13 @@ func (r User) Validate() error {
 		}
 		if utf8.RuneCountInString(v) < 5 {
 			errs.AddFieldErrf(fmt.Sprintf("Emails[%v]", k), "shorter than 5 chars")
+		}
+	}
+	if r.Title == nil {
+		errs.AddFieldErrf("Title", "cannot be nil")
+	} else {
+		if err := r.Title.Validate(); err != nil {
+			errs.AddFieldErr("Title", err)
 		}
 	}
 	return errs.ErrorOrNil()
