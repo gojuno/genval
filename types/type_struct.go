@@ -36,7 +36,7 @@ func (t *typeStruct) SetTag(tag Tag) error {
 }
 
 func (t typeStruct) Generate(w io.Writer, cfg GenConfig, name Name) {
-	registerError := "	errs.AddFieldErr(%s, err)\n"
+	registerError := "	errs.AddField(%s, err)\n"
 	if !cfg.SeveralErrors {
 		cfg.AddImport("fmt")
 		registerError = "	return fmt.Errorf(\"%%s %%v\", %s, err)\n"

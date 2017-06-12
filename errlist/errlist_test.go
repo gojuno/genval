@@ -10,61 +10,61 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func Test_ErrList_Add(t *testing.T) {
+func Test_List_Add(t *testing.T) {
 	t.Parallel()
 
-	t.Run("ErrList not nil", func(t *testing.T) {
-		var errs1, errs2 ErrList
-		errs2.AddFieldErr("2", errors.New("b"))
-		errs2.AddFieldErr("3", errors.New("c"))
+	t.Run("List not nil", func(t *testing.T) {
+		var errs1, errs2 List
+		errs2.AddField("2", errors.New("b"))
+		errs2.AddField("3", errors.New("c"))
 
-		errs1.AddFieldErr("1", errors.New("a"))
+		errs1.AddField("1", errors.New("a"))
 		errs1.Add(errs2)
 
 		assert.Equal(t, `[1: a, 2: b, 3: c]`, errs1.Error())
 	})
 
-	t.Run("ErrList nil", func(t *testing.T) {
-		var errs1 ErrList
+	t.Run("List nil", func(t *testing.T) {
+		var errs1 List
 
-		errs1.AddFieldErr("1", errors.New("a"))
+		errs1.AddField("1", errors.New("a"))
 		errs1.Add(nil)
 
 		assert.Equal(t, `[1: a]`, errs1.Error())
 	})
 
 	t.Run("unkown field", func(t *testing.T) {
-		var errs1 ErrList
+		var errs1 List
 
-		errs1.AddFieldErr("1", errors.New("a"))
+		errs1.AddField("1", errors.New("a"))
 		errs1.Add(errors.New("b"))
 
 		assert.Equal(t, `[1: a, unknown: b]`, errs1.Error())
 	})
 
 	t.Run("many errors", func(t *testing.T) {
-		var errs ErrList
+		var errs List
 
 		for i := 0; i < 100; i++ {
-			errs.AddFieldErrf("a", fmt.Sprintf("%d", i))
+			errs.AddFieldf("a", fmt.Sprintf("%d", i))
 		}
 
 		assert.Len(t, errs, 100)
 	})
 
 	t.Run("nil", func(t *testing.T) {
-		var errs ErrList
-		errs.AddFieldErr("a", nil)
+		var errs List
+		errs.AddField("a", nil)
 		assert.Len(t, errs, 0)
 		assert.Nil(t, errs)
 		assert.Equal(t, `[]`, errs.Error())
 	})
 
 	t.Run("normal", func(t *testing.T) {
-		var errs ErrList
+		var errs List
 
-		errs.AddFieldErr("1", errors.New("a"))
-		errs.AddFieldErr("2", errors.New("b"))
+		errs.AddField("1", errors.New("a"))
+		errs.AddField("2", errors.New("b"))
 
 		assert.Len(t, errs, 2)
 		assert.NotNil(t, errs)
@@ -72,11 +72,11 @@ func Test_ErrList_Add(t *testing.T) {
 	})
 }
 
-func Test_ErrList_Marshal(t *testing.T) {
-	var errs ErrList
+func Test_List_Marshal(t *testing.T) {
+	var errs List
 
-	errs.AddFieldErrf("x", "bla")
-	errs.AddFieldErrf("y", "poop")
+	errs.AddFieldf("x", "bla")
+	errs.AddFieldf("y", "poop")
 
 	res, err := json.Marshal(errs)
 	require.NoError(t, err)

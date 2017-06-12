@@ -8,21 +8,21 @@ import (
 
 const UnknownField = "unknown"
 
-type FieldErr struct {
+type Field struct {
 	Field string `json:"field"`
 	Err   error  `json:"err"`
 }
 
 // Error implements `error` interface
-func (e FieldErr) Error() string {
+func (e Field) Error() string {
 	return fmt.Sprintf("%s: %v", e.Field, e.Err)
 }
 
-func (e FieldErr) MarshalJSON() ([]byte, error) {
+func (e Field) MarshalJSON() ([]byte, error) {
 	data := fmt.Sprintf(`{"field":%q,"error":%q}`, e.Field, e.Err.Error())
 	return []byte(data), nil
 }
 
-func NewFieldErr(field, message string, args ...interface{}) error {
-	return &FieldErr{Field: field, Err: errors.Errorf(message, args...)}
+func NewField(field, message string, args ...interface{}) error {
+	return &Field{Field: field, Err: errors.Errorf(message, args...)}
 }

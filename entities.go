@@ -46,14 +46,14 @@ func (s StructDef) Generate(w io.Writer, cfg types.GenConfig) {
 				cfg.SeveralErrors = aliasType.Type() == types.Map || aliasType.Type() == types.Array
 				if cfg.SeveralErrors {
 					cfg.AddImport("github.com/gojuno/genval/errlist")
-					fmt.Fprint(w, "	var errs errlist.ErrList\n")
+					fmt.Fprint(w, "	var errs errlist.List\n")
 				}
 
 				aliasType.Generate(w, cfg, types.NewSimpleNameWithAliasType(varName, aliasType.Type()))
 
 			default:
 				cfg.AddImport("github.com/gojuno/genval/errlist")
-				fmt.Fprint(w, "	var errs errlist.ErrList\n")
+				fmt.Fprint(w, "	var errs errlist.List\n")
 
 				cfg.SeveralErrors = true
 

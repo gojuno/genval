@@ -6,10 +6,10 @@ import (
 	"github.com/pkg/errors"
 )
 
-type ErrList []FieldErr
+type List []Field
 
 // Error implements `error` interface
-func (e ErrList) Error() string {
+func (e List) Error() string {
 	var buffer bytes.Buffer
 
 	buffer.WriteString("[")
@@ -24,14 +24,14 @@ func (e ErrList) Error() string {
 	return buffer.String()
 }
 
-func (e *ErrList) Add(err error) *ErrList {
+func (e *List) Add(err error) *List {
 	if err == nil {
 		return e
 	}
 
-	list, ok := err.(ErrList)
+	list, ok := err.(List)
 	if !ok {
-		return e.AddFieldErr(UnknownField, err)
+		return e.AddField(UnknownField, err)
 	}
 	for _, fe := range list {
 		*e = append(*e, fe)
@@ -39,25 +39,25 @@ func (e *ErrList) Add(err error) *ErrList {
 	return e
 }
 
-func (e *ErrList) AddFieldErrf(field, msg string, args ...interface{}) *ErrList {
-	return e.AddFieldErr(field, errors.Errorf(msg, args...))
+func (e *List) AddFieldf(field, msg string, args ...interface{}) *List {
+	return e.AddField(field, errors.Errorf(msg, args...))
 }
 
-func (e *ErrList) AddFieldErr(field string, err error) *ErrList {
+func (e *List) AddField(field string, err error) *List {
 	if err == nil {
 		return e
 	}
 
-	*e = append(*e, FieldErr{Field: field, Err: err})
+	*e = append(*e, Field{Field: field, Err: err})
 
 	return e
 }
 
-func (e ErrList) HasErrors() bool {
+func (e List) HasErrors() bool {
 	return len(e) > 0
 }
 
-func (e ErrList) ErrorOrNil() error {
+func (e List) ErrorOrNil() error {
 	if e.HasErrors() {
 		return e
 	}
