@@ -73,10 +73,10 @@ func (r User) Validate() error {
 		_ = k
 		_ = v
 		if k > 3 {
-			errs.AddFieldErrf(fmt.Sprintf("Emails[%v]", k), "more than 3")
+			errs.AddFieldErrf(fmt.Sprintf("Emails.%v", k), "more than 3")
 		}
 		if utf8.RuneCountInString(v) < 5 {
-			errs.AddFieldErrf(fmt.Sprintf("Emails[%v]", k), "shorter than 5 chars")
+			errs.AddFieldErrf(fmt.Sprintf("Emails.%v", k), "shorter than 5 chars")
 		}
 	}
 	if r.Title == nil {

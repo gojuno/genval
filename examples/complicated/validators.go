@@ -75,7 +75,7 @@ func (r DogsMapAlias) Validate() error {
 		_ = k
 		_ = v
 		if err := v.Validate(); err != nil {
-			errs.AddFieldErr(fmt.Sprintf("r[%v]", k), err)
+			errs.AddFieldErr(fmt.Sprintf("r.%v", k), err)
 		}
 	}
 	return errs.ErrorOrNil()
@@ -151,7 +151,7 @@ func (r User) Validate() error {
 		_ = i
 		_ = x
 		if utf8.RuneCountInString(x) > 256 {
-			errs.AddFieldErrf(fmt.Sprintf("Urls[%v]", i), "longer than 256 chars")
+			errs.AddFieldErrf(fmt.Sprintf("Urls.%v", i), "longer than 256 chars")
 		}
 	}
 	if len(r.Dogs) < 1 {
@@ -162,7 +162,7 @@ func (r User) Validate() error {
 		_ = x
 		if x != nil {
 			if err := x.Validate(); err != nil {
-				errs.AddFieldErr(fmt.Sprintf("Dogs[%v]", i), err)
+				errs.AddFieldErr(fmt.Sprintf("Dogs.%v", i), err)
 			}
 		}
 	}
@@ -174,7 +174,7 @@ func (r User) Validate() error {
 			_ = i
 			_ = x
 			if x < 4 {
-				errs.AddFieldErrf(fmt.Sprintf("Test[%v]", i), "less than 4")
+				errs.AddFieldErrf(fmt.Sprintf("Test.%v", i), "less than 4")
 			}
 		}
 	}
@@ -188,7 +188,7 @@ func (r User) Validate() error {
 		_ = i
 		_ = x
 		if err := validateSome(x); err != nil {
-			errs.AddFieldErr(fmt.Sprintf("SomeArray[%v]", i), err)
+			errs.AddFieldErr(fmt.Sprintf("SomeArray.%v", i), err)
 		}
 	}
 	if len(r.Dict) < 2 {
@@ -198,23 +198,23 @@ func (r User) Validate() error {
 		_ = k
 		_ = v
 		if utf8.RuneCountInString(k) > 64 {
-			errs.AddFieldErrf(fmt.Sprintf("Dict[%v]", k), "longer than 64 chars")
+			errs.AddFieldErrf(fmt.Sprintf("Dict.%v", k), "longer than 64 chars")
 		}
 		if v < -35 {
-			errs.AddFieldErrf(fmt.Sprintf("Dict[%v]", k), "less than -35")
+			errs.AddFieldErrf(fmt.Sprintf("Dict.%v", k), "less than -35")
 		}
 		if v > 34 {
-			errs.AddFieldErrf(fmt.Sprintf("Dict[%v]", k), "more than 34")
+			errs.AddFieldErrf(fmt.Sprintf("Dict.%v", k), "more than 34")
 		}
 	}
 	for k, v := range r.DictDogs {
 		_ = k
 		_ = v
 		if err := v.ValidateOptional(); err != nil {
-			errs.AddFieldErr(fmt.Sprintf("DictDogs[%v]", k), err)
+			errs.AddFieldErr(fmt.Sprintf("DictDogs.%v", k), err)
 		}
 		if err := validateMaxDogName(v); err != nil {
-			errs.AddFieldErr(fmt.Sprintf("DictDogs[%v]", k), err)
+			errs.AddFieldErr(fmt.Sprintf("DictDogs.%v", k), err)
 		}
 	}
 	if err := r.Alias.Validate(); err != nil {
@@ -230,13 +230,13 @@ func (r User) Validate() error {
 		_ = k
 		_ = v
 		if len(v) < 1 {
-			errs.AddFieldErrf(fmt.Sprintf("MapOfMap[%v]", k), "less items than 1")
+			errs.AddFieldErrf(fmt.Sprintf("MapOfMap.%v", k), "less items than 1")
 		}
 		for k, v := range v {
 			_ = k
 			_ = v
 			if utf8.RuneCountInString(v) < 3 {
-				errs.AddFieldErrf(fmt.Sprintf("v[%v]", k), "shorter than 3 chars")
+				errs.AddFieldErrf(fmt.Sprintf("v.%v", k), "shorter than 3 chars")
 			}
 		}
 	}

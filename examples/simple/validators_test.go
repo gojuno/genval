@@ -62,6 +62,15 @@ func Test_User_Validate(t *testing.T) {
 			assert.Equal(t, "[Emails: less items than 1]", err.Error())
 		})
 
+		t.Run("bad email", func(t *testing.T) {
+			user := validUser
+			user.Emails = map[int]string{1: "abc"}
+
+			err := user.Validate()
+			require.NotNil(t, err)
+			assert.Equal(t, "[Emails.1: shorter than 5 chars]", err.Error())
+		})
+
 		t.Run("too young", func(t *testing.T) {
 			user := validUser
 			user.Age = 15

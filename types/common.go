@@ -75,7 +75,7 @@ func NewIndexedName(fieldName, indexVar, validateVar string) Name {
 		pointerPrefix: "",
 		structVar:     "",
 		fieldName:     validateVar,
-		labelName:     fmt.Sprintf("fmt.Sprintf(\"%s[%%v]\", %v)", fieldName, indexVar),
+		labelName:     fmt.Sprintf("fmt.Sprintf(\"%s.%%v\", %v)", fieldName, indexVar),
 	}
 }
 func NewSimpleNameWithAliasType(fieldName, aliasType string) Name {
