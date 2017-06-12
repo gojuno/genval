@@ -2,7 +2,6 @@ package types
 
 const (
 	ValidateTag = "validate"
-	JSONTag     = "json"
 )
 
 const (

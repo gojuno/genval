@@ -27,10 +27,10 @@ func validate(i interface{}) error {
 func (r Dog) Validate() error {
 	var errs errlist.ErrList
 	if utf8.RuneCountInString(r.Name) < 1 {
-		errs.AddFieldErrf("\"name\"", "shorter than 1 chars")
+		errs.AddFieldErrf("Name", "shorter than 1 chars")
 	}
 	if utf8.RuneCountInString(r.Name) > 64 {
-		errs.AddFieldErrf("\"name\"", "longer than 64 chars")
+		errs.AddFieldErrf("Name", "longer than 64 chars")
 	}
 	return errs.ErrorOrNil()
 }
@@ -39,19 +39,19 @@ func (r Dog) Validate() error {
 func (r User) Validate() error {
 	var errs errlist.ErrList
 	if utf8.RuneCountInString(r.Name) < 3 {
-		errs.AddFieldErrf("\"name\"", "shorter than 3 chars")
+		errs.AddFieldErrf("Name", "shorter than 3 chars")
 	}
 	if utf8.RuneCountInString(r.Name) > 64 {
-		errs.AddFieldErrf("\"name\"", "longer than 64 chars")
+		errs.AddFieldErrf("Name", "longer than 64 chars")
 	}
 	if r.Age < 18 {
-		errs.AddFieldErrf("\"age\"", "less than 18")
+		errs.AddFieldErrf("Age", "less than 18")
 	}
 	if r.Age > 95 {
-		errs.AddFieldErrf("\"age\"", "more than 95")
+		errs.AddFieldErrf("Age", "more than 95")
 	}
 	if err := r.Dog.Validate(); err != nil {
-		errs.AddFieldErr("\"dog_pet\"", err)
+		errs.AddFieldErr("Dog", err)
 	}
 	if len(r.Emails) < 1 {
 		errs.AddFieldErrf("Emails", "less items than 1")

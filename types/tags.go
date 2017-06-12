@@ -39,7 +39,6 @@ func ParseTags(astTag *ast.BasicLit, logCtx string) []Tag { //example: `json:"pl
 	tagString = removeQuotes(tagString) //clean from `json:"place_type,omitempty" validate:"min=1,max=64"` to  json:"place_type,omitempty" validate:"min=1,max=64"
 	splittedTags := strings.Split(tagString, " ")
 
-	var tags []Tag
 	for _, tagWithName := range splittedTags {
 		if tagWithName == "" {
 			continue
@@ -49,22 +48,16 @@ func ParseTags(astTag *ast.BasicLit, logCtx string) []Tag { //example: `json:"pl
 			log.Fatalf("invalid tag for %s: %s", logCtx, tagWithName)
 		}
 		tagName := strings.Trim(v[0], " ")
-
-		switch tagName {
-		case ValidateTag:
-			validateTags := parseFuncs(removeQuotes(v[1]), logCtx) //clean quotes from "min=1,max=64" to min=1,max=64
-			tags = append(tags, validateTags...)
-		case JSONTag:
-			tags = append(tags, SimpleTag{Name: tagName, Param: v[1]})
-		default:
-			for _, m := range misspellValidate {
-				if m == tagName {
-					log.Fatalf("tag validate is misspelled for %s: %s", logCtx, tagName)
-				}
+		if tagName == ValidateTag {
+			return parseFuncs(removeQuotes(v[1]), logCtx) //clean quotes from "min=1,max=64" to min=1,max=64
+		}
+		for _, m := range misspellValidate {
+			if m == tagName {
+				log.Fatalf("tag validate is misspelled for %s: %s", logCtx, tagName)
 			}
 		}
 	}
-	return tags
+	return nil
 }
 
 func scopeWasParsedRight(tagFunc string) bool {
