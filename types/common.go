@@ -138,3 +138,30 @@ func parseFuncsParam(p string) []string {
 	}
 	return res
 }
+
+func needGenerate(t TypeDef) bool {
+	switch tpe := t.(type) {
+	case *typeByte:
+		return false
+	case *typeBool:
+		return false
+	case *typeNumber:
+		if validMaxMin(tpe.max, tpe.min) {
+			return true
+		}
+		return false
+	case *typeString:
+		if validMaxMin(tpe.maxLen, tpe.minLen) {
+			return true
+		}
+		return false
+	case *typeArray:
+		return needGenerate(tpe.innerType) || validMaxMin(tpe.max, tpe.min)
+	default:
+		return true
+	}
+}
+
+func validMaxMin(max, min *string) bool {
+	return max != nil || (min != nil && *min != "0")
+}

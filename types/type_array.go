@@ -55,13 +55,15 @@ func (t typeArray) Generate(w io.Writer, cfg GenConfig, name Name) {
 		fmt.Fprintf(w, "    errs.AddFieldf(%s, \"more items than %s\")\n", name.LabelName(), *t.max)
 		fmt.Fprintf(w, "}\n")
 	}
-	fmt.Fprintf(w, "for i, x := range %s {\n", name.Full())
-	fmt.Fprintf(w, "	_ = i \n")
-	fmt.Fprintf(w, "	_ = x \n")
 
-	cfg.AddImport("fmt")
-	t.innerType.Generate(w, cfg, NewIndexedName(name.FieldName(), "i", "x"))
-	fmt.Fprintf(w, "}\n")
+	if needGenerate(t.innerType) || validMaxMin(t.max, t.min) {
+		fmt.Fprintf(w, "for i, x := range %s {\n", name.Full())
+		fmt.Fprintf(w, "	_ = i \n")
+		fmt.Fprintf(w, "	_ = x \n")
+		cfg.AddImport("fmt")
+		t.innerType.Generate(w, cfg, NewIndexedName(name.FieldName(), "i", "x"))
+		fmt.Fprintf(w, "}\n")
+	}
 }
 
 func (t typeArray) Validate() error {

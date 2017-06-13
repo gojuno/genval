@@ -63,14 +63,17 @@ func (t typeMap) Generate(w io.Writer, cfg GenConfig, name Name) {
 		fmt.Fprintf(w, "    errs.AddFieldf(%s, \"more items than %s\")\n", name.LabelName(), *t.max)
 		fmt.Fprintf(w, "}\n")
 	}
-	fmt.Fprintf(w, "for k, v := range %s {\n", name.Full())
-	fmt.Fprintf(w, "	_ = k \n")
-	fmt.Fprintf(w, "	_ = v \n")
 
-	cfg.AddImport("fmt")
-	t.key.Generate(w, cfg, NewIndexedName(name.FieldName(), "k", "k"))
-	t.value.Generate(w, cfg, NewIndexedName(name.FieldName(), "k", "v"))
-	fmt.Fprintf(w, "}\n")
+	if needGenerate(t.key) || needGenerate(t.value) {
+		fmt.Fprintf(w, "for k, v := range %s {\n", name.Full())
+		fmt.Fprintf(w, "	_ = k \n")
+		fmt.Fprintf(w, "	_ = v \n")
+
+		cfg.AddImport("fmt")
+		t.key.Generate(w, cfg, NewIndexedName(name.FieldName(), "k", "k"))
+		t.value.Generate(w, cfg, NewIndexedName(name.FieldName(), "k", "v"))
+		fmt.Fprintf(w, "}\n")
+	}
 }
 
 func (t typeMap) Validate() error {
