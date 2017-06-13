@@ -38,6 +38,7 @@ func ParseTags(astTag *ast.BasicLit, logCtx string) []Tag { //example: `json:"pl
 	}
 	tagString = removeQuotes(tagString) //clean from `json:"place_type,omitempty" validate:"min=1,max=64"` to  json:"place_type,omitempty" validate:"min=1,max=64"
 	splittedTags := strings.Split(tagString, " ")
+
 	for _, tagWithName := range splittedTags {
 		if tagWithName == "" {
 			continue

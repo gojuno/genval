@@ -39,14 +39,14 @@ func (t typeString) Generate(w io.Writer, cfg GenConfig, name Name) {
 		if *t.minLen != "0" {
 			cfg.AddImport("unicode/utf8")
 			fmt.Fprintf(w, "if utf8.RuneCountInString(%s) < %s {\n", name.Full(), *t.minLen)
-			fmt.Fprintf(w, "	   errs.AddFieldErrf(%s, \"shorter than %s chars\")\n", name.LabelName(), *t.minLen)
+			fmt.Fprintf(w, "	   errs.AddFieldf(%s, \"shorter than %s chars\")\n", name.LabelName(), *t.minLen)
 			fmt.Fprintf(w, "}\n")
 		}
 	}
 	if t.maxLen != nil {
 		cfg.AddImport("unicode/utf8")
 		fmt.Fprintf(w, "if utf8.RuneCountInString(%s) > %s {\n", name.Full(), *t.maxLen)
-		fmt.Fprintf(w, "	   errs.AddFieldErrf(%s ,\"longer than %s chars\")\n", name.LabelName(), *t.maxLen)
+		fmt.Fprintf(w, "	   errs.AddFieldf(%s ,\"longer than %s chars\")\n", name.LabelName(), *t.maxLen)
 		fmt.Fprintf(w, "}\n")
 	}
 }

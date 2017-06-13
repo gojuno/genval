@@ -40,9 +40,10 @@ func (t typePointer) Generate(w io.Writer, cfg GenConfig, name Name) {
 		fmt.Fprintf(w, "}\n")
 	} else {
 		fmt.Fprintf(w, "if %s == nil {\n", name.Full())
-		fmt.Fprintf(w, "    errs.AddFieldErrf(%s, \"cannot be nil\")\n", name.LabelName())
-		fmt.Fprintf(w, "}\n")
+		fmt.Fprintf(w, "    errs.AddFieldf(%s, \"cannot be nil\")\n", name.LabelName())
+		fmt.Fprintf(w, "} else {\n")
 		t.innerType.Generate(w, cfg, name.WithPointer())
+		fmt.Fprintf(w, "}\n")
 	}
 }
 

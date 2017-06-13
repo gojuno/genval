@@ -25,46 +25,66 @@ func validate(i interface{}) error {
 
 // Validate validates Dog
 func (r Dog) Validate() error {
-	var errs errlist.ErrList
+	var errs errlist.List
 	if utf8.RuneCountInString(r.Name) < 1 {
-		errs.AddFieldErrf("Name", "shorter than 1 chars")
+		errs.AddFieldf("Name", "shorter than 1 chars")
 	}
 	if utf8.RuneCountInString(r.Name) > 64 {
-		errs.AddFieldErrf("Name", "longer than 64 chars")
+		errs.AddFieldf("Name", "longer than 64 chars")
 	}
-	return &errs
+	return errs.ErrorOrNil()
+}
+
+// Validate validates Title
+func (r Title) Validate() error {
+	switch r {
+	case None:
+	case Doctor:
+	case Sir:
+	case Father:
+	default:
+		return fmt.Errorf("invalid value for enum Title: %v", r)
+	}
+	return nil
 }
 
 // Validate validates User
 func (r User) Validate() error {
-	var errs errlist.ErrList
+	var errs errlist.List
 	if utf8.RuneCountInString(r.Name) < 3 {
-		errs.AddFieldErrf("Name", "shorter than 3 chars")
+		errs.AddFieldf("Name", "shorter than 3 chars")
 	}
 	if utf8.RuneCountInString(r.Name) > 64 {
-		errs.AddFieldErrf("Name", "longer than 64 chars")
+		errs.AddFieldf("Name", "longer than 64 chars")
 	}
 	if r.Age < 18 {
-		errs.AddFieldErrf("Age", "less than 18")
+		errs.AddFieldf("Age", "less than 18")
 	}
 	if r.Age > 95 {
-		errs.AddFieldErrf("Age", "more than 95")
+		errs.AddFieldf("Age", "more than 95")
 	}
 	if err := r.Dog.Validate(); err != nil {
-		errs.AddFieldErr("Dog", err)
+		errs.AddField("Dog", err)
 	}
 	if len(r.Emails) < 1 {
-		errs.AddFieldErrf("Emails", "less items than 1")
+		errs.AddFieldf("Emails", "less items than 1")
 	}
 	for k, v := range r.Emails {
 		_ = k
 		_ = v
 		if k > 3 {
-			errs.AddFieldErrf(fmt.Sprintf("Emails[%v]", k), "more than 3")
+			errs.AddFieldf(fmt.Sprintf("Emails.%v", k), "more than 3")
 		}
 		if utf8.RuneCountInString(v) < 5 {
-			errs.AddFieldErrf(fmt.Sprintf("Emails[%v]", k), "shorter than 5 chars")
+			errs.AddFieldf(fmt.Sprintf("Emails.%v", k), "shorter than 5 chars")
 		}
 	}
-	return &errs
+	if r.Title == nil {
+		errs.AddFieldf("Title", "cannot be nil")
+	} else {
+		if err := r.Title.Validate(); err != nil {
+			errs.AddField("Title", err)
+		}
+	}
+	return errs.ErrorOrNil()
 }

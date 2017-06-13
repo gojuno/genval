@@ -54,23 +54,26 @@ func (t typeMap) Generate(w io.Writer, cfg GenConfig, name Name) {
 	if t.min != nil {
 		if *t.min != "0" {
 			fmt.Fprintf(w, "if len(%s) < %s {\n", name.Full(), *t.min)
-			fmt.Fprintf(w, "    errs.AddFieldErrf(%s, \"less items than %s\")\n", name.LabelName(), *t.min)
+			fmt.Fprintf(w, "    errs.AddFieldf(%s, \"less items than %s\")\n", name.LabelName(), *t.min)
 			fmt.Fprintf(w, "}\n")
 		}
 	}
 	if t.max != nil {
 		fmt.Fprintf(w, "if len(%s) > %s {\n", name.Full(), *t.max)
-		fmt.Fprintf(w, "    errs.AddFieldErrf(%s, \"more items than %s\")\n", name.LabelName(), *t.max)
+		fmt.Fprintf(w, "    errs.AddFieldf(%s, \"more items than %s\")\n", name.LabelName(), *t.max)
 		fmt.Fprintf(w, "}\n")
 	}
-	fmt.Fprintf(w, "for k, v := range %s {\n", name.Full())
-	fmt.Fprintf(w, "	_ = k \n")
-	fmt.Fprintf(w, "	_ = v \n")
 
-	cfg.AddImport("fmt")
-	t.key.Generate(w, cfg, NewIndexedName(name.FieldName(), "k", "k"))
-	t.value.Generate(w, cfg, NewIndexedName(name.FieldName(), "k", "v"))
-	fmt.Fprintf(w, "}\n")
+	if needGenerate(t.key) || needGenerate(t.value) {
+		fmt.Fprintf(w, "for k, v := range %s {\n", name.Full())
+		fmt.Fprintf(w, "	_ = k \n")
+		fmt.Fprintf(w, "	_ = v \n")
+
+		cfg.AddImport("fmt")
+		t.key.Generate(w, cfg, NewIndexedName(name.FieldName(), "k", "k"))
+		t.value.Generate(w, cfg, NewIndexedName(name.FieldName(), "k", "v"))
+		fmt.Fprintf(w, "}\n")
+	}
 }
 
 func (t typeMap) Validate() error {
