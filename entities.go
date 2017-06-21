@@ -28,10 +28,15 @@ func (s *StructDef) AddField(f FieldDef) {
 }
 
 func (s StructDef) Generate(w io.Writer, cfg types.GenConfig) {
-	if !s.HasOverridenValidation {
+	if s.HasOverridenValidation {
+		return
+	}
+
+	for _, tag := range cfg.SupportedTags {
+
 		varName := "r"
-		fmt.Fprintf(w, "// Validate validates %s\n", s.Name)
-		fmt.Fprintf(w, "func (%s %s) Validate() error {\n", varName, s.Name)
+		fmt.Fprintf(w, "// Validate%s validates %s\n", tag, s.Name)
+		fmt.Fprintf(w, "func (%s %s) Validate%s() error {\n", varName, s.Name, tag)
 
 		hasAnythingToValidate := (len(s.EnumValues) > 0) || s.aliasType != nil || len(s.fields) > 0 || s.HasAdditionalValidation
 		if !hasAnythingToValidate {
@@ -58,7 +63,13 @@ func (s StructDef) Generate(w io.Writer, cfg types.GenConfig) {
 				cfg.SeveralErrors = true
 
 				for _, field := range s.fields {
-					field.fieldType.Generate(w, cfg, types.NewName("", varName+".", field.fieldName))
+					field.fieldType.Generate(
+						w, cfg, types.NewName(
+							"",
+							varName+".",
+							field.fieldNames.Get(tag),
+							field.fieldNames.GetFromStructDefinition(),
+							tag))
 				}
 			}
 
@@ -94,21 +105,23 @@ func (s StructDef) generateEnumValidator(w io.Writer, cfg types.GenConfig, varNa
 }
 
 type FieldDef struct {
-	fieldName string
-	fieldType types.TypeDef
+	fieldNames types.FieldTagsNames
+	fieldType  types.TypeDef
 }
 
-func NewField(fieldName string, fieldType types.TypeDef, tags []types.Tag) (*FieldDef, error) {
-	for _, t := range tags {
-		if err := fieldType.SetTag(t); err != nil {
-			return nil, fmt.Errorf("set tags failed, field %s, tag: %+v, err: %s", fieldName, t, err)
+func NewField(fieldNames types.FieldTagsNames, fieldType types.TypeDef, validateTags []types.ValidatableTag) (*FieldDef, error) {
+	for _, t := range validateTags {
+		if err := fieldType.SetValidateTag(t); err != nil {
+			return nil, fmt.Errorf("set validateTags failed, field %s, tag: %+v, err: %s",
+				fieldNames.GetFromStructDefinition(), t, err)
 		}
 	}
 	if err := fieldType.Validate(); err != nil {
-		return nil, fmt.Errorf("tags validation failed for field %s, err: %s", fieldName, err)
+		return nil, fmt.Errorf("validateTags validation failed for field %s, err: %s",
+			fieldNames.GetFromStructDefinition(), err)
 	}
 	return &FieldDef{
-		fieldName: fieldName,
-		fieldType: fieldType,
+		fieldNames: fieldNames,
+		fieldType:  fieldType,
 	}, nil
 }

@@ -6,8 +6,26 @@ import (
 	"strings"
 )
 
-type Tag interface {
+type ValidatableTag interface {
 	Key() string
+}
+
+// contains {"json": "provider_id", "xml": "provider_id"} for
+// `json:"provider_id,omitempty" "xml":"provider_id" validate:"min_len=1"
+type FieldTagsNames map[string]string
+
+const FieldNameFromStructDefinition = ""
+
+func (n FieldTagsNames) Get(name string) string {
+	res, ok := n[strings.ToLower(name)]
+	if !ok {
+		return n.GetFromStructDefinition()
+	}
+	return res
+}
+
+func (n FieldTagsNames) GetFromStructDefinition() string {
+	return n[FieldNameFromStructDefinition]
 }
 
 type SimpleTag struct {
@@ -21,24 +39,25 @@ func (t SimpleTag) Key() string {
 
 type ScopeTag struct {
 	Name      string
-	InnerTags []Tag
+	InnerTags []ValidatableTag
 }
 
 func (t ScopeTag) Key() string {
 	return t.Name
 }
 
-func ParseTags(astTag *ast.BasicLit, logCtx string) []Tag { //example: `json:"place_type,omitempty" validate:"min=1,max=64"` OR `json:"user_id"`
+func ParseTags(astTag *ast.BasicLit, logCtx string) ([]ValidatableTag, FieldTagsNames) { //example: `json:"place_type,omitempty" validate:"min=1,max=64"` OR `json:"user_id"`
 	if astTag == nil {
-		return nil
+		return nil, nil
 	}
 	tagString := astTag.Value
 	if tagString == "" {
-		return nil
+		return nil, nil
 	}
 	tagString = removeQuotes(tagString) //clean from `json:"place_type,omitempty" validate:"min=1,max=64"` to  json:"place_type,omitempty" validate:"min=1,max=64"
 	splittedTags := strings.Split(tagString, " ")
-
+	validateTags := []ValidatableTag{}
+	nameTags := FieldTagsNames{}
 	for _, tagWithName := range splittedTags {
 		if tagWithName == "" {
 			continue
@@ -49,22 +68,30 @@ func ParseTags(astTag *ast.BasicLit, logCtx string) []Tag { //example: `json:"pl
 		}
 		tagName := strings.Trim(v[0], " ")
 		if tagName == ValidateTag {
-			return parseFuncs(removeQuotes(v[1]), logCtx) //clean quotes from "min=1,max=64" to min=1,max=64
+			validateTags = parseFuncs(removeQuotes(v[1]), logCtx) //clean quotes from "min=1,max=64" to min=1,max=64
+			continue
 		}
 		for _, m := range misspellValidate {
 			if m == tagName {
 				log.Fatalf("tag validate is misspelled for %s: %s", logCtx, tagName)
 			}
 		}
+		tagValues := strings.Split(strings.TrimSpace(v[1]), ",")
+		if len(tagValues) == 1 { // e.g. json:"field_name"
+			nameTags[tagName] = removeQuotes(tagValues[0])
+		} else { // e.g. handle json:"field_name,omitempty" where
+			// tagValues[0] = '"field_name', so we need to cut first char "
+			nameTags[tagName] = tagValues[0][1:len(tagValues[0])]
+		}
 	}
-	return nil
+	return validateTags, nameTags
 }
 
 func scopeWasParsedRight(tagFunc string) bool {
 	return strings.Count(tagFunc, "[") == strings.Count(tagFunc, "]")
 }
 
-func parseFuncs(functions string, logCtx string) []Tag { //min_items=5,key=[min=4,max=59],value=[min_len=1,max_len=64]
+func parseFuncs(functions string, logCtx string) []ValidatableTag { //min_items=5,key=[min=4,max=59],value=[min_len=1,max_len=64]
 	var funcs []string
 	cur := ""
 	for _, f := range strings.Split(functions, ",") {
@@ -79,7 +106,7 @@ func parseFuncs(functions string, logCtx string) []Tag { //min_items=5,key=[min=
 	if cur != "" {
 		log.Fatalf("parse funcs failed for %s, tag: %s", logCtx, functions)
 	}
-	var res []Tag
+	var res []ValidatableTag
 	for _, funcWithParam := range funcs {
 		tv := strings.SplitN(funcWithParam, "=", 2)
 		name := strings.Trim(tv[0], " ")

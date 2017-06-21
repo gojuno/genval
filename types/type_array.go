@@ -21,7 +21,7 @@ func (t typeArray) Type() string {
 	return Array
 }
 
-func (t *typeArray) SetTag(tag Tag) error {
+func (t *typeArray) SetValidateTag(tag ValidatableTag) error {
 	switch tag.Key() {
 	case ArrayMinItemsKey:
 		st := tag.(SimpleTag)
@@ -32,7 +32,7 @@ func (t *typeArray) SetTag(tag Tag) error {
 	case ArrayItemKey:
 		scope := tag.(ScopeTag)
 		for _, it := range scope.InnerTags {
-			if err := t.innerType.SetTag(it); err != nil {
+			if err := t.innerType.SetValidateTag(it); err != nil {
 				return fmt.Errorf("set item tags failed for %+v, err: %s", it, err)
 			}
 		}
@@ -61,7 +61,7 @@ func (t typeArray) Generate(w io.Writer, cfg GenConfig, name Name) {
 		fmt.Fprintf(w, "	_ = i \n")
 		fmt.Fprintf(w, "	_ = x \n")
 		cfg.AddImport("fmt")
-		t.innerType.Generate(w, cfg, NewIndexedName(name.FieldName(), "i", "x"))
+		t.innerType.Generate(w, cfg, NewIndexedName(name.labelName[1:len(name.labelName)-1], "i", "x", name.tagName))
 		fmt.Fprintf(w, "}\n")
 	}
 }

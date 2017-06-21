@@ -17,7 +17,7 @@ func (t typeInterface) Type() string {
 	return "interface"
 }
 
-func (t *typeInterface) SetTag(tag Tag) error {
+func (t *typeInterface) SetValidateTag(tag ValidatableTag) error {
 	switch tag.Key() {
 	case InterfaceFuncKey:
 		for _, v := range parseFuncsParam(tag.(SimpleTag).Param) {

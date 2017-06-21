@@ -26,6 +26,7 @@ type inspector struct {
 }
 
 type config struct {
+	supportedTags    []string
 	dir              string
 	pkg              string
 	outputFile       string
@@ -151,9 +152,13 @@ func (insp *inspector) visitStruct(astTypeSpec *ast.TypeSpec) {
 		for _, astField := range astFields {
 			fieldType := parseFieldType(astField.Type, fmt.Sprintf("struct %s", structName))
 			fieldName := parseFieldName(astField.Names, fieldType)
-			tags := types.ParseTags(astField.Tag, fmt.Sprintf("struct %s, field %s", structName, fieldName))
+			tags, nameTags := types.ParseTags(astField.Tag, fmt.Sprintf("struct %s, field %s", structName, fieldName))
+			fieldNames := map[string]string{"": fieldName}
+			for k, v := range nameTags {
+				fieldNames[k] = v
+			}
 
-			field, err := NewField(fieldName, fieldType, tags)
+			field, err := NewField(fieldNames, fieldType, tags)
 			if err != nil {
 				log.Fatalf("field creation failed for struct %s, %s", structName, err)
 			}

@@ -20,7 +20,7 @@ func (t typeString) Type() string {
 	return String
 }
 
-func (t *typeString) SetTag(tag Tag) error {
+func (t *typeString) SetValidateTag(tag ValidatableTag) error {
 	switch tag.Key() {
 	case StringMinLenKey:
 		st := tag.(SimpleTag)

@@ -48,7 +48,14 @@ func (e *List) AddField(field string, err error) *List {
 		return e
 	}
 
-	*e = append(*e, Field{Field: field, Err: err})
+	switch errTyped := err.(type) {
+	case List:
+		for _, childErr := range errTyped {
+			*e = append(*e, Field{Field: field + "." + childErr.Field, Err: childErr.Err})
+		}
+	case error:
+		*e = append(*e, Field{Field: field, Err: err})
+	}
 
 	return e
 }

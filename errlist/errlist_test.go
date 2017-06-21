@@ -13,6 +13,17 @@ import (
 func Test_List_Add(t *testing.T) {
 	t.Parallel()
 
+	t.Run("err is errlist", func(t *testing.T) {
+		var errs1, errs2 List
+		errs2.AddField("2", errors.New("b"))
+		errs2.AddField("3", errors.New("c"))
+
+		errs1.AddField("1", errors.New("a"))
+		errs1.AddField("errs2", errs2)
+
+		assert.Equal(t, `[1: a, errs2.2: b, errs2.3: c]`, errs1.Error())
+	})
+
 	t.Run("List not nil", func(t *testing.T) {
 		var errs1, errs2 List
 		errs2.AddField("2", errors.New("b"))
