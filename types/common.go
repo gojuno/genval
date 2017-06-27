@@ -10,7 +10,7 @@ import (
 
 type TypeDef interface {
 	Type() string
-	SetTag(Tag) error
+	SetValidateTag(ValidatableTag) error
 	Validate() error
 	Generate(w io.Writer, cfg GenConfig, name Name)
 }
@@ -20,6 +20,7 @@ var ErrUnusedTag = errors.New("unused tag")
 type GenConfig struct {
 	NeedValidatableCheck bool
 	SeveralErrors        bool
+	SupportedTags        []string
 	AddImport            func(string)
 }
 
@@ -29,6 +30,7 @@ type Name struct {
 	structVar     string
 	fieldName     string
 	labelName     string
+	tagName       string
 }
 
 func (n Name) Full() string {
@@ -54,28 +56,30 @@ func (n Name) LabelName() string {
 	return n.labelName
 }
 
-func NewName(pointerPrefix, structVar, fieldName string) Name {
+func NewName(pointerPrefix, structVar, labelName, fieldName, tagName string) Name {
 	return Name{
 		pointerPrefix: pointerPrefix,
 		structVar:     structVar,
 		fieldName:     fieldName,
-		labelName:     fmt.Sprintf("%q", fieldName),
+		labelName:     fmt.Sprintf("%q", labelName),
+		tagName:       tagName,
 	}
 }
-func NewSimpleName(fieldName string) Name {
+func NewSimpleName(labelName, fieldName string) Name {
 	return Name{
 		pointerPrefix: "",
 		structVar:     "",
 		fieldName:     fieldName,
-		labelName:     fmt.Sprintf("%q", fieldName),
+		labelName:     fmt.Sprintf("%q", labelName),
 	}
 }
-func NewIndexedName(fieldName, indexVar, validateVar string) Name {
+func NewIndexedName(labelName, indexVar, validateVar, tagName string) Name {
 	return Name{
 		pointerPrefix: "",
 		structVar:     "",
 		fieldName:     validateVar,
-		labelName:     fmt.Sprintf("fmt.Sprintf(\"%s.%%v\", %v)", fieldName, indexVar),
+		labelName:     fmt.Sprintf("fmt.Sprintf(\"%s.%%v\", %v)", labelName, indexVar),
+		tagName:       tagName,
 	}
 }
 func NewSimpleNameWithAliasType(fieldName, aliasType string) Name {
@@ -157,6 +161,8 @@ func needGenerate(t TypeDef) bool {
 		return false
 	case *typeArray:
 		return needGenerate(tpe.innerType) || validMaxMin(tpe.max, tpe.min)
+	case *typeMap:
+		return needGenerate(tpe.key) || needGenerate(tpe.value)
 	default:
 		return true
 	}

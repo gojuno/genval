@@ -18,7 +18,7 @@ type typeNumber struct {
 func (t typeNumber) Type() string {
 	return t.typeName
 }
-func (t *typeNumber) SetTag(tag Tag) error {
+func (t *typeNumber) SetValidateTag(tag ValidatableTag) error {
 	switch tag.Key() {
 	case NumberMinKey:
 		st := tag.(SimpleTag)

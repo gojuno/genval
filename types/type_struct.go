@@ -23,7 +23,7 @@ func (t typeStruct) Type() string {
 	return t.typeName
 }
 
-func (t *typeStruct) SetTag(tag Tag) error {
+func (t *typeStruct) SetValidateTag(tag ValidatableTag) error {
 	switch tag.Key() {
 	case StructFuncKey:
 		for _, v := range parseFuncsParam(tag.(SimpleTag).Param) {
@@ -36,7 +36,8 @@ func (t *typeStruct) SetTag(tag Tag) error {
 }
 
 func (t typeStruct) Generate(w io.Writer, cfg GenConfig, name Name) {
-	registerError := "	errs.AddField(%s, err)\n"
+	registerError := `errs.AddField(%s, err)`
+
 	if !cfg.SeveralErrors {
 		cfg.AddImport("fmt")
 		registerError = "	return fmt.Errorf(\"%%s %%v\", %s, err)\n"
@@ -56,11 +57,11 @@ func (t typeStruct) Generate(w io.Writer, cfg GenConfig, name Name) {
 			}
 		}
 	case !cfg.NeedValidatableCheck, !t.external:
-		fmt.Fprintf(w, "if err := %s.Validate(); err != nil {\n", name.WithAlias())
+		fmt.Fprintf(w, "if err := %s.Validate%s(); err != nil {\n", name.WithAlias(), name.tagName)
 		fmt.Fprintf(w, registerError, name.LabelName())
 		fmt.Fprintf(w, "}\n")
 	default:
-		fmt.Fprintf(w, "if err := validate(%s); err != nil {\n", name.WithAlias())
+		fmt.Fprintf(w, "if err := validate%s(%s); err != nil {\n", name.tagName, name.WithAlias())
 		fmt.Fprintf(w, registerError, name.LabelName())
 		fmt.Fprintf(w, "}\n")
 	}

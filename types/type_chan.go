@@ -13,7 +13,7 @@ func (t typeChan) Type() string {
 	return "chan"
 }
 
-func (t *typeChan) SetTag(tag Tag) error {
+func (t *typeChan) SetValidateTag(tag ValidatableTag) error {
 	return ErrUnusedTag
 }
 
