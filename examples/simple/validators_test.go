@@ -86,7 +86,7 @@ func Test_User_Validate(t *testing.T) {
 
 			err := user.Validate()
 			require.NotNil(t, err)
-			assert.Equal(t, `[Dog: [Name: shorter than 1 chars]]`, err.Error())
+			assert.Equal(t, `[Dog.Name: shorter than 1 chars]`, err.Error())
 		})
 	})
 }
