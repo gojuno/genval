@@ -69,14 +69,14 @@ func (r User) Validate() error {
 	if len(r.Emails) < 1 {
 		errs.AddFieldf("Emails", "less items than 1")
 	}
-	for k, v := range r.Emails {
-		_ = k
-		_ = v
-		if k > 3 {
-			errs.AddFieldf(fmt.Sprintf("Emails.%v", k), "more than 3")
+	for key9, valueb := range r.Emails {
+		_ = key9
+		_ = valueb
+		if key9 > 3 {
+			errs.AddFieldf(fmt.Sprintf("Emails"+".%v", key9), "more than 3")
 		}
-		if utf8.RuneCountInString(v) < 5 {
-			errs.AddFieldf(fmt.Sprintf("Emails.%v", k), "shorter than 5 chars")
+		if utf8.RuneCountInString(valueb) < 5 {
+			errs.AddFieldf(fmt.Sprintf("Emails"+".%v", key9), "shorter than 5 chars")
 		}
 	}
 	if r.Title == nil {

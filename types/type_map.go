@@ -1,8 +1,10 @@
 package types
 
 import (
+	"crypto/md5"
 	"fmt"
 	"io"
+	"log"
 )
 
 const Map string = "map"
@@ -65,12 +67,14 @@ func (t typeMap) Generate(w io.Writer, cfg GenConfig, name Name) {
 	}
 
 	if needGenerate(&t) {
-		fmt.Fprintf(w, "for k, v := range %s {\n", name.Full())
-		fmt.Fprintf(w, "	_ = k \n")
-		fmt.Fprintf(w, "	_ = v \n")
+		keyVarName := genName(name.fieldName, true)
+		valVarName := genName(name.fieldName, false)
+		fmt.Fprintf(w, "for %s, %s := range %s {\n", keyVarName, valVarName, name.Full())
+		fmt.Fprintf(w, "	_ = %s \n", keyVarName)
+		fmt.Fprintf(w, "	_ = %s \n", valVarName)
 		cfg.AddImport("fmt")
-		t.key.Generate(w, cfg, NewIndexedName(name.labelName[1:len(name.labelName)-1], "k", "k", name.tagName))
-		t.value.Generate(w, cfg, NewIndexedName(name.labelName[1:len(name.labelName)-1], "k", "v", name.tagName))
+		t.key.Generate(w, cfg, NewIndexedName(name.LabelName(), keyVarName, keyVarName, name.tagName, true))
+		t.value.Generate(w, cfg, NewIndexedName(name.LabelName(), keyVarName, valVarName, name.tagName, true))
 		fmt.Fprintf(w, "}\n")
 	}
 }
@@ -98,4 +102,17 @@ func (t typeMap) Validate() error {
 		return err
 	}
 	return t.value.Validate()
+}
+
+func genName(baseName string, key bool) string {
+	postfix := "value"
+	if key {
+		postfix = "key"
+	}
+	digest := md5.New()
+	n, err := digest.Write([]byte(baseName + postfix))
+	if err != nil {
+		log.Fatalf("failed to build map key/value name for field %s", baseName)
+	}
+	return fmt.Sprintf("%s%x", postfix, n)
 }
