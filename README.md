@@ -1,4 +1,4 @@
-# genval [![Build Status](https://travis-ci.org/gojuno/genval.svg?branch=master)](https://travis-ci.org/gojuno/genval)
+# genval [![GoDoc](https://godoc.org/github.com/gojuno/genval?status.svg)](http://godoc.org/github.com/gojuno/genval) [![Build Status](https://travis-ci.org/gojuno/genval.svg?branch=master)](https://travis-ci.org/gojuno/genval)
 
 Generates Validate() methods for all structs in package by tags
 - no reflection in generated code - it means fast  
