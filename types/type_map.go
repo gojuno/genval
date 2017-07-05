@@ -103,9 +103,9 @@ func (t typeMap) Validate() error {
 }
 
 func genName(baseName string, key bool) string {
-	postfix := "value"
+	postfix := "Value"
 	if key {
-		postfix = "key"
+		postfix = "Key"
 	}
-	return fmt.Sprintf("%s%s%x", baseName, postfix, len(baseName))
+	return fmt.Sprintf("%s%s", baseName, postfix)
 }

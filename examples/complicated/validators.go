@@ -67,11 +67,11 @@ func (r Dog) Validate() error {
 // Validate validates DogsMapAlias
 func (r DogsMapAlias) Validate() error {
 	var errs errlist.List
-	for rkey1, rvalue1 := range r {
-		_ = rkey1
-		_ = rvalue1
-		if err := rvalue1.Validate(); err != nil {
-			errs.AddField(fmt.Sprintf("r"+".%v", rkey1), err)
+	for rKey, rValue := range r {
+		_ = rKey
+		_ = rValue
+		if err := rValue.Validate(); err != nil {
+			errs.AddField(fmt.Sprintf("r"+".%v", rKey), err)
 		}
 	}
 	return errs.ErrorOrNil()
@@ -190,27 +190,27 @@ func (r User) Validate() error {
 	if len(r.Dict) < 2 {
 		errs.AddFieldf("Dict", "less items than 2")
 	}
-	for Dictkey4, Dictvalue4 := range r.Dict {
-		_ = Dictkey4
-		_ = Dictvalue4
-		if utf8.RuneCountInString(Dictkey4) > 64 {
-			errs.AddFieldf(fmt.Sprintf("Dict"+".%v", Dictkey4), "longer than 64 chars")
+	for DictKey, DictValue := range r.Dict {
+		_ = DictKey
+		_ = DictValue
+		if utf8.RuneCountInString(DictKey) > 64 {
+			errs.AddFieldf(fmt.Sprintf("Dict"+".%v", DictKey), "longer than 64 chars")
 		}
-		if Dictvalue4 < -35 {
-			errs.AddFieldf(fmt.Sprintf("Dict"+".%v", Dictkey4), "less than -35")
+		if DictValue < -35 {
+			errs.AddFieldf(fmt.Sprintf("Dict"+".%v", DictKey), "less than -35")
 		}
-		if Dictvalue4 > 34 {
-			errs.AddFieldf(fmt.Sprintf("Dict"+".%v", Dictkey4), "more than 34")
+		if DictValue > 34 {
+			errs.AddFieldf(fmt.Sprintf("Dict"+".%v", DictKey), "more than 34")
 		}
 	}
-	for DictDogskey8, DictDogsvalue8 := range r.DictDogs {
-		_ = DictDogskey8
-		_ = DictDogsvalue8
-		if err := DictDogsvalue8.ValidateOptional(); err != nil {
-			errs.AddField(fmt.Sprintf("DictDogs"+".%v", DictDogskey8), err)
+	for DictDogsKey, DictDogsValue := range r.DictDogs {
+		_ = DictDogsKey
+		_ = DictDogsValue
+		if err := DictDogsValue.ValidateOptional(); err != nil {
+			errs.AddField(fmt.Sprintf("DictDogs"+".%v", DictDogsKey), err)
 		}
-		if err := validateMaxDogName(DictDogsvalue8); err != nil {
-			errs.AddField(fmt.Sprintf("DictDogs"+".%v", DictDogskey8), err)
+		if err := validateMaxDogName(DictDogsValue); err != nil {
+			errs.AddField(fmt.Sprintf("DictDogs"+".%v", DictDogsKey), err)
 		}
 	}
 	if err := r.Alias.Validate(); err != nil {
@@ -222,17 +222,17 @@ func (r User) Validate() error {
 	if err := r.AliasOnAliasWithCustomValidate.ValidateAlias(); err != nil {
 		errs.AddField("AliasOnAliasWithCustomValidate", err)
 	}
-	for MapOfMapkey8, MapOfMapvalue8 := range r.MapOfMap {
-		_ = MapOfMapkey8
-		_ = MapOfMapvalue8
-		if len(MapOfMapvalue8) < 1 {
-			errs.AddFieldf(fmt.Sprintf("MapOfMap"+".%v", MapOfMapkey8), "less items than 1")
+	for MapOfMapKey, MapOfMapValue := range r.MapOfMap {
+		_ = MapOfMapKey
+		_ = MapOfMapValue
+		if len(MapOfMapValue) < 1 {
+			errs.AddFieldf(fmt.Sprintf("MapOfMap"+".%v", MapOfMapKey), "less items than 1")
 		}
-		for MapOfMapvalue8keye, MapOfMapvalue8valuee := range MapOfMapvalue8 {
-			_ = MapOfMapvalue8keye
-			_ = MapOfMapvalue8valuee
-			if utf8.RuneCountInString(MapOfMapvalue8valuee) < 3 {
-				errs.AddFieldf(fmt.Sprintf(fmt.Sprintf("MapOfMap"+".%v", MapOfMapkey8)+".%v", MapOfMapvalue8keye), "shorter than 3 chars")
+		for MapOfMapValueKey, MapOfMapValueValue := range MapOfMapValue {
+			_ = MapOfMapValueKey
+			_ = MapOfMapValueValue
+			if utf8.RuneCountInString(MapOfMapValueValue) < 3 {
+				errs.AddFieldf(fmt.Sprintf(fmt.Sprintf("MapOfMap"+".%v", MapOfMapKey)+".%v", MapOfMapValueKey), "shorter than 3 chars")
 			}
 		}
 	}
