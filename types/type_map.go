@@ -1,10 +1,8 @@
 package types
 
 import (
-	"crypto/md5"
 	"fmt"
 	"io"
-	"log"
 )
 
 const Map string = "map"
@@ -109,10 +107,5 @@ func genName(baseName string, key bool) string {
 	if key {
 		postfix = "key"
 	}
-	digest := md5.New()
-	n, err := digest.Write([]byte(baseName + postfix))
-	if err != nil {
-		log.Fatalf("failed to build map key/value name for field %s", baseName)
-	}
-	return fmt.Sprintf("%s%x", postfix, n)
+	return fmt.Sprintf("%s%s%x", baseName, postfix, len(baseName))
 }
