@@ -61,7 +61,7 @@ func (t typeArray) Generate(w io.Writer, cfg GenConfig, name Name) {
 		fmt.Fprintf(w, "	_ = i \n")
 		fmt.Fprintf(w, "	_ = x \n")
 		cfg.AddImport("fmt")
-		t.innerType.Generate(w, cfg, NewIndexedName(name.labelName[1:len(name.labelName)-1], "i", "x", name.tagName))
+		t.innerType.Generate(w, cfg, NewIndexedName(name.labelName[1:len(name.labelName)-1], "i", "x", name.tagName, false))
 		fmt.Fprintf(w, "}\n")
 	}
 }

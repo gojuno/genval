@@ -73,12 +73,18 @@ func NewSimpleName(labelName, fieldName string) Name {
 		labelName:     fmt.Sprintf("%q", labelName),
 	}
 }
-func NewIndexedName(labelName, indexVar, validateVar, tagName string) Name {
+func NewIndexedName(labelName, indexVar, validateVar, tagName string, complexLabelName bool) Name {
+
+	labelNamePrepared := fmt.Sprintf("fmt.Sprintf(\"%s.%%v\", %v)", labelName, indexVar)
+	if complexLabelName {
+		labelNamePrepared = fmt.Sprintf("fmt.Sprintf(%s + \".%%v\", %v)", labelName, indexVar)
+	}
+
 	return Name{
 		pointerPrefix: "",
 		structVar:     "",
 		fieldName:     validateVar,
-		labelName:     fmt.Sprintf("fmt.Sprintf(\"%s.%%v\", %v)", labelName, indexVar),
+		labelName:     labelNamePrepared,
 		tagName:       tagName,
 	}
 }
