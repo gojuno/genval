@@ -2,28 +2,34 @@ package types
 
 import (
 	"fmt"
+	"go/ast"
 	"io"
 	"strings"
 )
 
-func NewStruct(typeName string) *typeStruct {
-	return &typeStruct{typeName: typeName, external: false}
+func NewCustom(fieldName string, typeExpr ast.Expr) *typeCustom {
+	return &typeCustom{typeName: fieldName, typeExpr: typeExpr, external: false}
 }
-func NewExternalStruct(typeName string) *typeStruct {
-	return &typeStruct{typeName: typeName, external: true}
+func NewExternalCustom(typeName string, typeExpr ast.Expr) *typeCustom {
+	return &typeCustom{typeName: typeName, typeExpr: typeExpr, external: true}
 }
 
-type typeStruct struct {
+type typeCustom struct {
 	typeName string
+	typeExpr ast.Expr
 	external bool
 	funcs    []string
 }
 
-func (t typeStruct) Type() string {
+func (t typeCustom) Type() string {
 	return t.typeName
 }
 
-func (t *typeStruct) SetValidateTag(tag ValidatableTag) error {
+func (t typeCustom) Expr() ast.Expr {
+	return t.typeExpr
+}
+
+func (t *typeCustom) SetValidateTag(tag ValidatableTag) error {
 	switch tag.Key() {
 	case StructFuncKey:
 		for _, v := range parseFuncsParam(tag.(SimpleTag).Param) {
@@ -35,7 +41,7 @@ func (t *typeStruct) SetValidateTag(tag ValidatableTag) error {
 	return nil
 }
 
-func (t typeStruct) Generate(w io.Writer, cfg GenConfig, name Name) {
+func (t typeCustom) Generate(w io.Writer, cfg GenConfig, name Name) {
 	registerError := `errs.AddField(%s, err)`
 
 	if !cfg.SeveralErrors {
@@ -67,6 +73,6 @@ func (t typeStruct) Generate(w io.Writer, cfg GenConfig, name Name) {
 	}
 }
 
-func (t typeStruct) Validate() error {
+func (t typeCustom) Validate() error {
 	return nil
 }

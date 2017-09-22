@@ -15,10 +15,10 @@ type Age2 struct {
 
 func (r Age2) ValidateMin10() error {
 	if r.Value < 10 { // 3 was override on 10
-		return fmt.Errorf("field Age is less than 10 ")
+		return fmt.Errorf("field Age is less than 10")
 	}
 	if r.Value > 64 {
-		return fmt.Errorf("field Age is more than 64 ")
+		return fmt.Errorf("field Age is more than 64")
 	}
 	return nil
 }

@@ -1,5 +1,6 @@
 package main
 
+//go:generate ./genval -d examples/aliases -p aliases
 //go:generate ./genval -d examples/simple -p simple
 //go:generate ./genval -d examples/overriding -p overriding
 //go:generate ./genval -d examples/complicated -p complicated
@@ -13,7 +14,7 @@ import (
 )
 
 const (
-	version = "1.3"
+	version = "1.4"
 )
 
 var (

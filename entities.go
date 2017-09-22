@@ -109,7 +109,8 @@ type FieldDef struct {
 	fieldType  types.TypeDef
 }
 
-func NewField(fieldNames types.FieldTagsNames, fieldType types.TypeDef, validateTags []types.ValidatableTag) (*FieldDef, error) {
+func NewField(fieldNames types.FieldTagsNames, fieldType types.TypeDef, validateTags types.ValidatableTags) (*FieldDef, error) {
+	fieldType = toPrimitiveType(fieldType, validateTags)
 	for _, t := range validateTags {
 		if err := fieldType.SetValidateTag(t); err != nil {
 			return nil, fmt.Errorf("set validateTags failed, field %s, tag: %+v, err: %s",
@@ -124,4 +125,30 @@ func NewField(fieldNames types.FieldTagsNames, fieldType types.TypeDef, validate
 		fieldNames: fieldNames,
 		fieldType:  fieldType,
 	}, nil
+}
+
+func toPrimitiveType(fieldType types.TypeDef, validateTags types.ValidatableTags) types.TypeDef {
+	if validateTags.Empty() {
+		return fieldType
+	}
+
+	if len(validateTags) == 1 && validateTags.ContainsTag(types.SimpleTag{Name: types.PointerNotNullKey}) {
+		return fieldType
+	}
+
+	if fieldType.Expr() == nil {
+		return fieldType
+	}
+
+	underlyingPrimitive := parsePrimitiveType(fieldType.Expr(), fmt.Sprintf("field type %s", fieldType.Type()))
+	if underlyingPrimitive != nil {
+		// case: pointer to custom type with not_null: ( "Name *SimpleStringType `validate:not_null,min_len=1`")
+		p, isPtr := fieldType.(*types.TypePointer)
+		if isPtr {
+			return p.SetInnerType(underlyingPrimitive)
+		}
+		return underlyingPrimitive
+	}
+
+	return fieldType
 }

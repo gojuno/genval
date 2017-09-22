@@ -1,6 +1,9 @@
 package types
 
-import "io"
+import (
+	"go/ast"
+	"io"
+)
 
 const Bool string = "bool"
 
@@ -24,5 +27,9 @@ func (t typeBool) Generate(w io.Writer, cfg GenConfig, name Name) {
 }
 
 func (t typeBool) Validate() error {
+	return nil
+}
+
+func (t typeBool) Expr() ast.Expr {
 	return nil
 }

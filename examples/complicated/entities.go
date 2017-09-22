@@ -68,11 +68,3 @@ func (r AliasOnDogsMapAlias) ValidateAlias() error {
 	}
 	return nil
 }
-
-type AliasString string
-
-type AliasArray []string
-
-type AliasFunc func() string
-
-type AliasChan <-chan string

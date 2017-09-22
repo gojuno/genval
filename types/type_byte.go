@@ -1,6 +1,9 @@
 package types
 
-import "io"
+import (
+	"go/ast"
+	"io"
+)
 
 const Byte string = "byte"
 
@@ -24,5 +27,9 @@ func (t typeByte) Generate(w io.Writer, cfg GenConfig, name Name) {
 }
 
 func (t typeByte) Validate() error {
+	return nil
+}
+
+func (t typeByte) Expr() ast.Expr {
 	return nil
 }

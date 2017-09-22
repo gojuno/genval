@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"go/ast"
 	"io"
 )
 
@@ -108,4 +109,8 @@ func genName(baseName string, key bool) string {
 		postfix = "Key"
 	}
 	return fmt.Sprintf("%s%s", baseName, postfix)
+}
+
+func (t typeMap) Expr() ast.Expr {
+	return nil
 }
