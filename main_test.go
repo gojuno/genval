@@ -8,4 +8,5 @@ func Test_Main(m *testing.T) {
 	generate(config{[]string{""}, "examples/simple", "simple", "validators.go", exc}, true)
 	generate(config{[]string{""}, "examples/complicated", "complicated", "validators.go", exc}, true)
 	generate(config{[]string{""}, "examples/overriding", "overriding", "validators.go", exc}, true)
+	generate(config{[]string{""}, "examples/aliases", "aliases", "validators.go", exc}, true)
 }

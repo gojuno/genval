@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"go/ast"
 	"io"
 )
 
@@ -38,5 +39,9 @@ func (t typeInterface) Generate(w io.Writer, cfg GenConfig, name Name) {
 }
 
 func (t typeInterface) Validate() error {
+	return nil
+}
+
+func (t typeInterface) Expr() ast.Expr {
 	return nil
 }

@@ -1,5 +1,6 @@
 package main
 
+//go:generate ./genval -d examples/aliases -p aliases
 //go:generate ./genval -d examples/simple -p simple
 //go:generate ./genval -d examples/overriding -p overriding
 //go:generate ./genval -d examples/complicated -p complicated
@@ -7,13 +8,14 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"strings"
 )
 
 const (
-	version = "1.3"
+	version = "1.4"
 )
 
 var (
@@ -21,6 +23,7 @@ var (
 	outputFile           = flag.String("outputFile", "validators.go", "output file name")
 	dir                  = flag.String("d", "", "directory with files to be validated")
 	pkg                  = flag.String("p", "", "package with files to be validated")
+	printVersion         = flag.Bool("version", false, "print current version")
 	needValidatableCheck = flag.Bool("needValidatableCheck", true, "check struct on Validatable before calling Validate()")
 	excludeRegexp        = flag.String("excludeRegexp", `(client\.go|client_mock\.go)`,
 		"regexp file names that generator should exclude, e.g. `(client\\.go|client_mock\\.go)`")
@@ -28,6 +31,11 @@ var (
 
 func main() {
 	flag.Parse()
+
+	if *printVersion {
+		fmt.Fprintf(os.Stdout, "genval version: %s\n", version)
+		os.Exit(0)
+	}
 
 	// if directory & package aren`t set then first argument is used for both flags
 	d, p := *dir, *pkg

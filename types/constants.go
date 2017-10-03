@@ -2,9 +2,7 @@ package types
 
 const (
 	ValidateTag = "validate"
-)
 
-const (
 	StringMinLenKey string = "min_len"
 	StringMaxLenKey string = "max_len"
 

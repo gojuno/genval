@@ -1,6 +1,9 @@
 package types
 
-import "io"
+import (
+	"go/ast"
+	"io"
+)
 
 func NewFunc() *typeFunc {
 	return &typeFunc{}
@@ -22,5 +25,9 @@ func (t typeFunc) Generate(w io.Writer, cfg GenConfig, name Name) {
 }
 
 func (t typeFunc) Validate() error {
+	return nil
+}
+
+func (t typeFunc) Expr() ast.Expr {
 	return nil
 }

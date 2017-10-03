@@ -6,8 +6,28 @@ import (
 	"strings"
 )
 
+// ValidatableTag represents a tag that uses for validating
 type ValidatableTag interface {
+	// Key returns a tag title
 	Key() string
+}
+
+// ValidatableTags represents a set of ValidatableTag
+type ValidatableTags []ValidatableTag
+
+// Empty check whether ValidatableTags is empty
+func (ts ValidatableTags) Empty() bool {
+	return len(ts) == 0
+}
+
+// ContainsTag checks whether ValidatableTags contains a ValidatableTag
+func (ts ValidatableTags) ContainsTag(t ValidatableTag) bool {
+	for _, v := range ts {
+		if v.Key() == t.Key() {
+			return true
+		}
+	}
+	return false
 }
 
 // contains {"json": "provider_id", "xml": "provider_id"} for

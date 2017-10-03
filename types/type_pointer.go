@@ -2,26 +2,32 @@ package types
 
 import (
 	"fmt"
+	"go/ast"
 	"io"
 )
 
-func NewPointer(inner TypeDef) *typePointer {
-	return &typePointer{
+func NewPointer(inner TypeDef) *TypePointer {
+	return &TypePointer{
 		nullable:  true,
 		innerType: inner,
 	}
 }
 
-type typePointer struct {
+type TypePointer struct {
 	nullable  bool
 	innerType TypeDef
 }
 
-func (t typePointer) Type() string {
+func (t *TypePointer) Type() string {
 	return t.innerType.Type()
 }
 
-func (t *typePointer) SetValidateTag(tag ValidatableTag) error {
+func (t *TypePointer) SetInnerType(newType TypeDef) *TypePointer {
+	t.innerType = newType
+	return t
+}
+
+func (t *TypePointer) SetValidateTag(tag ValidatableTag) error {
 	switch tag.Key() {
 	case PointerNullableKey:
 		t.nullable = true
@@ -33,7 +39,7 @@ func (t *typePointer) SetValidateTag(tag ValidatableTag) error {
 	return nil
 }
 
-func (t typePointer) Generate(w io.Writer, cfg GenConfig, name Name) {
+func (t *TypePointer) Generate(w io.Writer, cfg GenConfig, name Name) {
 	if t.nullable {
 		fmt.Fprintf(w, "if %s != nil {\n", name.Full())
 		t.innerType.Generate(w, cfg, name.WithPointer())
@@ -47,6 +53,10 @@ func (t typePointer) Generate(w io.Writer, cfg GenConfig, name Name) {
 	}
 }
 
-func (t typePointer) Validate() error {
+func (t *TypePointer) Validate() error {
 	return t.innerType.Validate()
+}
+
+func (t *TypePointer) Expr() ast.Expr {
+	return t.innerType.Expr()
 }

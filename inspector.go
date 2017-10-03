@@ -185,9 +185,9 @@ func parseFieldType(t ast.Expr, logCtx string) types.TypeDef {
 		if simple != nil {
 			return simple
 		}
-		return types.NewStruct(v.Name)
+		return types.NewCustom(v.Name, t)
 	case *ast.SelectorExpr:
-		return types.NewExternalStruct(v.Sel.Name)
+		return types.NewExternalCustom(v.Sel.Name, t)
 	case *ast.ArrayType:
 		return types.NewArray(parseFieldType(v.Elt, logCtx))
 	case *ast.StarExpr:
@@ -202,6 +202,25 @@ func parseFieldType(t ast.Expr, logCtx string) types.TypeDef {
 		return types.NewChan()
 	}
 	log.Fatalf("undefined typeField for %s: %+v, %T", logCtx, t, t)
+	return nil
+}
+
+func parsePrimitiveType(e ast.Expr, logCtx string) types.TypeDef {
+	v, ok := e.(*ast.Ident)
+	if !ok {
+		return nil
+	}
+
+	if v.Obj != nil && v.Obj.Decl != nil {
+		if typeSpec, ok := v.Obj.Decl.(*ast.TypeSpec); ok {
+			switch customType := typeSpec.Type.(type) {
+			case *ast.StructType:
+				// 	*ast.StructType isn't supported yet
+			default:
+				return parseFieldType(customType, logCtx)
+			}
+		}
+	}
 	return nil
 }
 

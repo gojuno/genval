@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"go/ast"
 	"io"
 )
 
@@ -56,4 +57,8 @@ func (t typeNumber) Validate() error {
 			return nil
 		},
 	)
+}
+
+func (t typeNumber) Expr() ast.Expr {
+	return nil
 }

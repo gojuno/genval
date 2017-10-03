@@ -34,6 +34,15 @@ func Test_User_Validate(t *testing.T) {
 			assert.Equal(t, `[Name: shorter than 3 chars]`, err.Error())
 		})
 
+		t.Run("too long name", func(t *testing.T) {
+			user := validUser
+			user.Name = "123456789123456789123456789123456789123456789123456789123456789123456789"
+
+			err := user.Validate()
+			require.NotNil(t, err)
+			assert.Equal(t, `[Name: longer than 64 chars]`, err.Error())
+		})
+
 		t.Run("nil title", func(t *testing.T) {
 			user := validUser
 			user.Title = nil
@@ -62,13 +71,13 @@ func Test_User_Validate(t *testing.T) {
 			assert.Equal(t, "[Emails: less items than 1]", err.Error())
 		})
 
-		t.Run("bad email", func(t *testing.T) {
+		t.Run("bad email key and value", func(t *testing.T) {
 			user := validUser
-			user.Emails = map[int]string{1: "abc"}
+			user.Emails = map[int]string{1111: "abc"}
 
 			err := user.Validate()
 			require.NotNil(t, err)
-			assert.Equal(t, "[Emails.1: shorter than 5 chars]", err.Error())
+			assert.Equal(t, "[Emails.1111: more than 3, Emails.1111: shorter than 5 chars]", err.Error())
 		})
 
 		t.Run("too young", func(t *testing.T) {
@@ -78,6 +87,15 @@ func Test_User_Validate(t *testing.T) {
 			err := user.Validate()
 			require.NotNil(t, err)
 			assert.Equal(t, `[Age: less than 18]`, err.Error())
+		})
+
+		t.Run("too old", func(t *testing.T) {
+			user := validUser
+			user.Age = 111
+
+			err := user.Validate()
+			require.NotNil(t, err)
+			assert.Equal(t, `[Age: more than 95]`, err.Error())
 		})
 
 		t.Run("bad dog", func(t *testing.T) {
@@ -103,5 +121,18 @@ func Test_Dog_Validate(t *testing.T) {
 		t.Run("too big", func(t *testing.T) {
 			assert.NotNil(t, Dog{"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}.Validate())
 		})
+	})
+}
+
+func Test_Title_Validate(t *testing.T) {
+	t.Run("valid", func(t *testing.T) {
+		assert.NoError(t, Title(None).Validate())
+		assert.NoError(t, Title(Doctor).Validate())
+		assert.NoError(t, Title(Sir).Validate())
+		assert.NoError(t, Title(Father).Validate())
+	})
+
+	t.Run("invalid", func(t *testing.T) {
+		assert.Error(t, Title("unknown").Validate())
 	})
 }

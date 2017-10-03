@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"go/ast"
 	"io"
 )
 
@@ -86,4 +87,8 @@ func (t typeArray) Validate() error {
 		return err
 	}
 	return t.innerType.Validate()
+}
+
+func (t typeArray) Expr() ast.Expr {
+	return nil
 }

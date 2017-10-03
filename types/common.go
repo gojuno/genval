@@ -3,6 +3,7 @@ package types
 import (
 	"errors"
 	"fmt"
+	"go/ast"
 	"io"
 	"strconv"
 	"strings"
@@ -13,6 +14,7 @@ type TypeDef interface {
 	SetValidateTag(ValidatableTag) error
 	Validate() error
 	Generate(w io.Writer, cfg GenConfig, name Name)
+	Expr() ast.Expr
 }
 
 var ErrUnusedTag = errors.New("unused tag")
@@ -65,14 +67,7 @@ func NewName(pointerPrefix, structVar, labelName, fieldName, tagName string) Nam
 		tagName:       tagName,
 	}
 }
-func NewSimpleName(labelName, fieldName string) Name {
-	return Name{
-		pointerPrefix: "",
-		structVar:     "",
-		fieldName:     fieldName,
-		labelName:     fmt.Sprintf("%q", labelName),
-	}
-}
+
 func NewIndexedName(labelName, indexVar, validateVar, tagName string, complexLabelName bool) Name {
 
 	labelNamePrepared := fmt.Sprintf("fmt.Sprintf(\"%s.%%v\", %v)", labelName, indexVar)
