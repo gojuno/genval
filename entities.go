@@ -132,7 +132,9 @@ func toPrimitiveType(fieldType types.TypeDef, validateTags types.ValidatableTags
 		return fieldType
 	}
 
-	if len(validateTags) == 1 && validateTags.ContainsTag(types.SimpleTag{Name: types.PointerNotNullKey}) {
+	if len(validateTags) == 1 &&
+		(validateTags.ContainsTag(types.SimpleTag{Name: types.PointerNotNullKey})) ||
+		(validateTags.ContainsTag(types.SimpleTag{Name: types.StructFuncKey})) {
 		return fieldType
 	}
 

@@ -12,10 +12,11 @@ func Test_User_Validate(t *testing.T) {
 
 	someString := StringType("aaaaaaaaaaaaaaaaaaaab")
 	validUser := User{
-		FirstName:     "firstName",
-		LastName:      "lastName",
-		FamilyMembers: 99,
-		SomeFloat:     5.55,
+		FirstName:      "firstName",
+		LastName:       "lastName",
+		NonEmptyString: "test",
+		FamilyMembers:  99,
+		SomeFloat:      5.55,
 		SomeMap: map[string]int{
 			"test":  1,
 			"test2": 2,
@@ -49,10 +50,11 @@ func Test_User_Validate(t *testing.T) {
 		t.Run("some_pointer: not_null rule", func(t *testing.T) {
 			r := validUser
 			r.SomePointer = nil
+			r.NonEmptyString = ""
 
 			err := r.Validate()
 			require.NotNil(t, err)
-			assert.Equal(t, `[SomePointer: cannot be nil]`, err.Error())
+			assert.Equal(t, `[NonEmptyString: string is empty, SomePointer: cannot be nil]`, err.Error())
 		})
 
 		t.Run("some_pointer: using overridden alias validator", func(t *testing.T) {
@@ -63,6 +65,15 @@ func Test_User_Validate(t *testing.T) {
 			err := r.Validate()
 			require.NotNil(t, err)
 			assert.Equal(t, `[SomePointer: shorter than 20 chars]`, err.Error())
+		})
+
+		t.Run("non_empty_string: using func validator", func(t *testing.T) {
+			r := validUser
+			r.NonEmptyString = ""
+
+			err := r.Validate()
+			require.NotNil(t, err)
+			assert.Equal(t, `[NonEmptyString: string is empty]`, err.Error())
 		})
 	})
 }

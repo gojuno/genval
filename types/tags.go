@@ -23,7 +23,7 @@ func (ts ValidatableTags) Empty() bool {
 // ContainsTag checks whether ValidatableTags contains a ValidatableTag
 func (ts ValidatableTags) ContainsTag(t ValidatableTag) bool {
 	for _, v := range ts {
-		if v == t {
+		if v.Key() == t.Key() {
 			return true
 		}
 	}

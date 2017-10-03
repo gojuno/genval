@@ -54,6 +54,9 @@ func (r User) Validate() error {
 	if utf8.RuneCountInString(string(r.LastName)) > 15 {
 		errs.AddFieldf("LastName", "longer than 15 chars")
 	}
+	if err := r.NonEmptyString.ValidateNotEmpty(); err != nil {
+		errs.AddField("NonEmptyString", err)
+	}
 	if r.FamilyMembers < 1 {
 		errs.AddFieldf("FamilyMembers", "less than 1")
 	}
