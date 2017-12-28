@@ -33,6 +33,10 @@ func (t *typeNumber) SetValidateTag(tag ValidatableTag) error {
 	return nil
 }
 
+func (t typeNumber) NeedGenerate() bool {
+	return validMaxMin(t.max, t.min)
+}
+
 func (t typeNumber) Generate(w io.Writer, cfg GenConfig, name Name) {
 	if t.min != nil {
 		fmt.Fprintf(w, "if %s < %s {\n", name.Full(), *t.min)

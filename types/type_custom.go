@@ -41,6 +41,10 @@ func (t *typeCustom) SetValidateTag(tag ValidatableTag) error {
 	return nil
 }
 
+func (t typeCustom) NeedGenerate() bool {
+	return true
+}
+
 func (t typeCustom) Generate(w io.Writer, cfg GenConfig, name Name) {
 	registerError := `errs.AddField(%s, err)`
 

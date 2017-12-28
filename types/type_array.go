@@ -43,6 +43,10 @@ func (t *typeArray) SetValidateTag(tag ValidatableTag) error {
 	return nil
 }
 
+func (t typeArray) NeedGenerate() bool {
+	return t.innerType.NeedGenerate() || validMaxMin(t.max, t.min)
+}
+
 func (t typeArray) Generate(w io.Writer, cfg GenConfig, name Name) {
 	if t.min != nil {
 		if *t.min != "0" {
@@ -57,12 +61,14 @@ func (t typeArray) Generate(w io.Writer, cfg GenConfig, name Name) {
 		fmt.Fprintf(w, "}\n")
 	}
 
-	if needGenerate(t.innerType) || validMaxMin(t.max, t.min) {
-		fmt.Fprintf(w, "for i, x := range %s {\n", name.Full())
-		fmt.Fprintf(w, "	_ = i \n")
-		fmt.Fprintf(w, "	_ = x \n")
+	if t.innerType.NeedGenerate() {
+		kName := "k" + name.fieldName
+		vName := "v" + name.fieldName
+		fmt.Fprintf(w, "for %s, %s := range %s {\n", kName, vName, name.Full())
+		fmt.Fprintf(w, "	_ = %s \n", kName)
+		fmt.Fprintf(w, "	_ = %s \n", vName)
 		cfg.AddImport("fmt")
-		t.innerType.Generate(w, cfg, NewIndexedName(name.labelName[1:len(name.labelName)-1], "i", "x", name.tagName, false))
+		t.innerType.Generate(w, cfg, NewIndexedName(name.labelName, kName, vName, name.tagName))
 		fmt.Fprintf(w, "}\n")
 	}
 }

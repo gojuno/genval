@@ -31,6 +31,8 @@ type User struct {
 	AliasOnAlias                   AliasOnDogsMapAlias
 	AliasOnAliasWithCustomValidate AliasOnDogsMapAlias       `validate:"func=.ValidateAlias"`
 	MapOfMap                       map[string]map[int]string `validate:"value=[min_items=1,value=[min_len=3]]"`
+	MapOfSlice                     map[string][]string       `validate:"value=[min_items=1,item=[max_len=256]]"`
+	SliceOfSliceOfSlice            [][][]string              `validate:"min_items=1,item=[min_items=1,item=[min_items=1,item=[max_len=256]]]"`
 	FuncField                      func(int) string
 	ChanField                      <-chan int
 	ByteField                      byte

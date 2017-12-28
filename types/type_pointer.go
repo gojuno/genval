@@ -39,6 +39,10 @@ func (t *TypePointer) SetValidateTag(tag ValidatableTag) error {
 	return nil
 }
 
+func (t TypePointer) NeedGenerate() bool {
+	return true
+}
+
 func (t *TypePointer) Generate(w io.Writer, cfg GenConfig, name Name) {
 	if t.nullable {
 		fmt.Fprintf(w, "if %s != nil {\n", name.Full())
