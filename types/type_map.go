@@ -69,15 +69,19 @@ func (t typeMap) Generate(w io.Writer, cfg GenConfig, name Name) {
 		fmt.Fprintf(w, "}\n")
 	}
 
-	if t.key.NeedGenerate() || t.value.NeedGenerate() {
-		kName := "k" + name.fieldName
-		vName := "v" + name.fieldName
+	if keyNeedGenerate, valueNeedGenerate := t.key.NeedGenerate(), t.value.NeedGenerate(); keyNeedGenerate || valueNeedGenerate {
+		kName, vName := "k"+name.fieldName, "_"
+		if valueNeedGenerate {
+			vName = "v" + name.fieldName
+		}
 		fmt.Fprintf(w, "for %s, %s := range %s {\n", kName, vName, name.Full())
-		fmt.Fprintf(w, "	_ = %s \n", kName)
-		fmt.Fprintf(w, "	_ = %s \n", vName)
 		cfg.AddImport("fmt")
-		t.key.Generate(w, cfg, NewIndexedName(name.labelName, kName, kName, name.tagName))
-		t.value.Generate(w, cfg, NewIndexedName(name.labelName, vName, vName, name.tagName))
+		if keyNeedGenerate {
+			t.key.Generate(w, cfg, NewIndexedKeyName(name.labelName, kName, kName, name.tagName))
+		}
+		if valueNeedGenerate {
+			t.value.Generate(w, cfg, NewIndexedValueName(name.labelName, kName, vName, name.tagName))
+		}
 		fmt.Fprintf(w, "}\n")
 	}
 }

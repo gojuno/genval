@@ -73,16 +73,14 @@ func (r User) Validate() error {
 		errs.AddFieldf("SomeMap", "less items than 2")
 	}
 	for kSomeMap, vSomeMap := range r.SomeMap {
-		_ = kSomeMap
-		_ = vSomeMap
 		if utf8.RuneCountInString(string(kSomeMap)) > 64 {
-			errs.AddFieldf(fmt.Sprintf("SomeMap"+".%v", kSomeMap), "longer than 64 chars")
+			errs.AddFieldf(fmt.Sprintf("SomeMap"+".key[%v]", kSomeMap), "longer than 64 chars")
 		}
 		if vSomeMap < -35 {
-			errs.AddFieldf(fmt.Sprintf("SomeMap"+".%v", vSomeMap), "less than -35")
+			errs.AddFieldf(fmt.Sprintf("SomeMap"+".%v", kSomeMap), "less than -35")
 		}
 		if vSomeMap > 34 {
-			errs.AddFieldf(fmt.Sprintf("SomeMap"+".%v", vSomeMap), "more than 34")
+			errs.AddFieldf(fmt.Sprintf("SomeMap"+".%v", kSomeMap), "more than 34")
 		}
 	}
 	if r.SomePointer == nil {

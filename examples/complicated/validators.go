@@ -47,10 +47,8 @@ func (r Dog) Validate() error {
 func (r DogsMapAlias) Validate() error {
 	var errs errlist.List
 	for kr, vr := range r {
-		_ = kr
-		_ = vr
 		if err := vr.Validate(); err != nil {
-			errs.AddField(fmt.Sprintf("r"+".%v", vr), err)
+			errs.AddField(fmt.Sprintf("r"+".%v", kr), err)
 		}
 	}
 	return errs.ErrorOrNil()
@@ -123,8 +121,6 @@ func (r User) Validate() error {
 		errs.AddFieldf("Urls", "less items than 1")
 	}
 	for kUrls, vUrls := range r.Urls {
-		_ = kUrls
-		_ = vUrls
 		if utf8.RuneCountInString(string(vUrls)) > 256 {
 			errs.AddFieldf(fmt.Sprintf("Urls"+".%v", kUrls), "longer than 256 chars")
 		}
@@ -133,8 +129,6 @@ func (r User) Validate() error {
 		errs.AddFieldf("Dogs", "less items than 1")
 	}
 	for kDogs, vDogs := range r.Dogs {
-		_ = kDogs
-		_ = vDogs
 		if vDogs != nil {
 			if err := vDogs.Validate(); err != nil {
 				errs.AddField(fmt.Sprintf("Dogs"+".%v", kDogs), err)
@@ -146,8 +140,6 @@ func (r User) Validate() error {
 			errs.AddFieldf("Test", "less items than 1")
 		}
 		for kTest, vTest := range *r.Test {
-			_ = kTest
-			_ = vTest
 			if vTest < 4 {
 				errs.AddFieldf(fmt.Sprintf("Test"+".%v", kTest), "less than 4")
 			}
@@ -160,8 +152,6 @@ func (r User) Validate() error {
 		errs.AddFieldf("SomeArray", "less items than 1")
 	}
 	for kSomeArray, vSomeArray := range r.SomeArray {
-		_ = kSomeArray
-		_ = vSomeArray
 		if err := validateSome(vSomeArray); err != nil {
 			errs.AddField(fmt.Sprintf("SomeArray"+".%v", kSomeArray), err)
 		}
@@ -170,26 +160,22 @@ func (r User) Validate() error {
 		errs.AddFieldf("Dict", "less items than 2")
 	}
 	for kDict, vDict := range r.Dict {
-		_ = kDict
-		_ = vDict
 		if utf8.RuneCountInString(string(kDict)) > 64 {
-			errs.AddFieldf(fmt.Sprintf("Dict"+".%v", kDict), "longer than 64 chars")
+			errs.AddFieldf(fmt.Sprintf("Dict"+".key[%v]", kDict), "longer than 64 chars")
 		}
 		if vDict < -35 {
-			errs.AddFieldf(fmt.Sprintf("Dict"+".%v", vDict), "less than -35")
+			errs.AddFieldf(fmt.Sprintf("Dict"+".%v", kDict), "less than -35")
 		}
 		if vDict > 34 {
-			errs.AddFieldf(fmt.Sprintf("Dict"+".%v", vDict), "more than 34")
+			errs.AddFieldf(fmt.Sprintf("Dict"+".%v", kDict), "more than 34")
 		}
 	}
 	for kDictDogs, vDictDogs := range r.DictDogs {
-		_ = kDictDogs
-		_ = vDictDogs
 		if err := vDictDogs.ValidateOptional(); err != nil {
-			errs.AddField(fmt.Sprintf("DictDogs"+".%v", vDictDogs), err)
+			errs.AddField(fmt.Sprintf("DictDogs"+".%v", kDictDogs), err)
 		}
 		if err := validateMaxDogName(vDictDogs); err != nil {
-			errs.AddField(fmt.Sprintf("DictDogs"+".%v", vDictDogs), err)
+			errs.AddField(fmt.Sprintf("DictDogs"+".%v", kDictDogs), err)
 		}
 	}
 	if err := r.Alias.Validate(); err != nil {
@@ -202,30 +188,38 @@ func (r User) Validate() error {
 		errs.AddField("AliasOnAliasWithCustomValidate", err)
 	}
 	for kMapOfMap, vMapOfMap := range r.MapOfMap {
-		_ = kMapOfMap
-		_ = vMapOfMap
+		if utf8.RuneCountInString(string(kMapOfMap)) < 3 {
+			errs.AddFieldf(fmt.Sprintf("MapOfMap"+".key[%v]", kMapOfMap), "shorter than 3 chars")
+		}
 		if len(vMapOfMap) < 1 {
-			errs.AddFieldf(fmt.Sprintf("MapOfMap"+".%v", vMapOfMap), "less items than 1")
+			errs.AddFieldf(fmt.Sprintf("MapOfMap"+".%v", kMapOfMap), "less items than 1")
 		}
 		for kvMapOfMap, vvMapOfMap := range vMapOfMap {
-			_ = kvMapOfMap
-			_ = vvMapOfMap
 			if utf8.RuneCountInString(string(vvMapOfMap)) < 3 {
-				errs.AddFieldf(fmt.Sprintf(fmt.Sprintf("MapOfMap"+".%v", vMapOfMap)+".%v", vvMapOfMap), "shorter than 3 chars")
+				errs.AddFieldf(fmt.Sprintf(fmt.Sprintf("MapOfMap"+".%v", kMapOfMap)+".%v", kvMapOfMap), "shorter than 3 chars")
 			}
 		}
 	}
 	for kMapOfSlice, vMapOfSlice := range r.MapOfSlice {
-		_ = kMapOfSlice
-		_ = vMapOfSlice
 		if len(vMapOfSlice) < 1 {
-			errs.AddFieldf(fmt.Sprintf("MapOfSlice"+".%v", vMapOfSlice), "less items than 1")
+			errs.AddFieldf(fmt.Sprintf("MapOfSlice"+".%v", kMapOfSlice), "less items than 1")
 		}
 		for kvMapOfSlice, vvMapOfSlice := range vMapOfSlice {
-			_ = kvMapOfSlice
-			_ = vvMapOfSlice
 			if utf8.RuneCountInString(string(vvMapOfSlice)) > 256 {
-				errs.AddFieldf(fmt.Sprintf(fmt.Sprintf("MapOfSlice"+".%v", vMapOfSlice)+".%v", kvMapOfSlice), "longer than 256 chars")
+				errs.AddFieldf(fmt.Sprintf(fmt.Sprintf("MapOfSlice"+".%v", kMapOfSlice)+".%v", kvMapOfSlice), "longer than 256 chars")
+			}
+		}
+	}
+	for kSliceOfMap, vSliceOfMap := range r.SliceOfMap {
+		if len(vSliceOfMap) < 1 {
+			errs.AddFieldf(fmt.Sprintf("SliceOfMap"+".%v", kSliceOfMap), "less items than 1")
+		}
+		for kvSliceOfMap, vvSliceOfMap := range vSliceOfMap {
+			if utf8.RuneCountInString(string(kvSliceOfMap)) < 3 {
+				errs.AddFieldf(fmt.Sprintf(fmt.Sprintf("SliceOfMap"+".%v", kSliceOfMap)+".key[%v]", kvSliceOfMap), "shorter than 3 chars")
+			}
+			if vvSliceOfMap < 1 {
+				errs.AddFieldf(fmt.Sprintf(fmt.Sprintf("SliceOfMap"+".%v", kSliceOfMap)+".%v", kvSliceOfMap), "less than 1")
 			}
 		}
 	}
@@ -233,20 +227,14 @@ func (r User) Validate() error {
 		errs.AddFieldf("SliceOfSliceOfSlice", "less items than 1")
 	}
 	for kSliceOfSliceOfSlice, vSliceOfSliceOfSlice := range r.SliceOfSliceOfSlice {
-		_ = kSliceOfSliceOfSlice
-		_ = vSliceOfSliceOfSlice
 		if len(vSliceOfSliceOfSlice) < 1 {
 			errs.AddFieldf(fmt.Sprintf("SliceOfSliceOfSlice"+".%v", kSliceOfSliceOfSlice), "less items than 1")
 		}
 		for kvSliceOfSliceOfSlice, vvSliceOfSliceOfSlice := range vSliceOfSliceOfSlice {
-			_ = kvSliceOfSliceOfSlice
-			_ = vvSliceOfSliceOfSlice
 			if len(vvSliceOfSliceOfSlice) < 1 {
 				errs.AddFieldf(fmt.Sprintf(fmt.Sprintf("SliceOfSliceOfSlice"+".%v", kSliceOfSliceOfSlice)+".%v", kvSliceOfSliceOfSlice), "less items than 1")
 			}
 			for kvvSliceOfSliceOfSlice, vvvSliceOfSliceOfSlice := range vvSliceOfSliceOfSlice {
-				_ = kvvSliceOfSliceOfSlice
-				_ = vvvSliceOfSliceOfSlice
 				if utf8.RuneCountInString(string(vvvSliceOfSliceOfSlice)) > 256 {
 					errs.AddFieldf(fmt.Sprintf(fmt.Sprintf(fmt.Sprintf("SliceOfSliceOfSlice"+".%v", kSliceOfSliceOfSlice)+".%v", kvSliceOfSliceOfSlice)+".%v", kvvSliceOfSliceOfSlice), "longer than 256 chars")
 				}

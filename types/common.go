@@ -69,7 +69,7 @@ func NewName(pointerPrefix, structVar, labelName, fieldName, tagName string) Nam
 	}
 }
 
-func NewIndexedName(labelName, indexVar, validateVar, tagName string) Name {
+func NewIndexedValueName(labelName, indexVar, validateVar, tagName string) Name {
 	return Name{
 		pointerPrefix: "",
 		structVar:     "",
@@ -78,6 +78,17 @@ func NewIndexedName(labelName, indexVar, validateVar, tagName string) Name {
 		tagName:       tagName,
 	}
 }
+
+func NewIndexedKeyName(labelName, indexVar, validateVar, tagName string) Name {
+	return Name{
+		pointerPrefix: "",
+		structVar:     "",
+		fieldName:     validateVar,
+		labelName:     fmt.Sprintf("fmt.Sprintf(%s + \".key[%%v]\", %v)", labelName, indexVar),
+		tagName:       tagName,
+	}
+}
+
 func NewSimpleNameWithAliasType(fieldName, aliasType string) Name {
 	return Name{
 		aliasType:     &aliasType,

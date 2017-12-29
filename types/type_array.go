@@ -65,10 +65,8 @@ func (t typeArray) Generate(w io.Writer, cfg GenConfig, name Name) {
 		kName := "k" + name.fieldName
 		vName := "v" + name.fieldName
 		fmt.Fprintf(w, "for %s, %s := range %s {\n", kName, vName, name.Full())
-		fmt.Fprintf(w, "	_ = %s \n", kName)
-		fmt.Fprintf(w, "	_ = %s \n", vName)
 		cfg.AddImport("fmt")
-		t.innerType.Generate(w, cfg, NewIndexedName(name.labelName, kName, vName, name.tagName))
+		t.innerType.Generate(w, cfg, NewIndexedValueName(name.labelName, kName, vName, name.tagName))
 		fmt.Fprintf(w, "}\n")
 	}
 }
