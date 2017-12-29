@@ -34,6 +34,28 @@ func Test_Request1_Validate(t *testing.T) {
 			"test":   1,
 			"test_2": 2,
 		},
+		MapOfMap: map[string]map[int]string{
+			"key": {
+				1: "value",
+			},
+		},
+		MapOfSlice: map[string][]string{
+			"key": {
+				"value",
+			},
+		},
+		SliceOfMap: []map[string]int{
+			{
+				"key": 1,
+			},
+		},
+		SliceOfSliceOfSlice: [][][]string{
+			{
+				{
+					"value",
+				},
+			},
+		},
 	}
 
 	t.Run("valid", func(t *testing.T) {
@@ -128,6 +150,50 @@ func Test_Request1_Validate(t *testing.T) {
 
 			err := r.Validate()
 			require.NoError(t, err)
+		})
+
+		t.Run("MapOfMap: invalid value", func(t *testing.T) {
+			r := validUser
+			r.MapOfMap = map[string]map[int]string{
+				"key": {
+					1: "v",
+				},
+			}
+
+			err := r.Validate()
+			require.NotNil(t, err)
+			assert.Equal(t, `[MapOfMap.key.1: shorter than 3 chars]`, err.Error())
+		})
+
+		t.Run("SliceOfMap: invalid key", func(t *testing.T) {
+			r := validUser
+			r.SliceOfMap = []map[string]int{
+				{
+					"k": 1,
+				},
+			}
+
+			err := r.Validate()
+			require.NotNil(t, err)
+			assert.Equal(t, `[SliceOfMap.0.key[k]: shorter than 3 chars]`, err.Error())
+		})
+
+		t.Run("SliceOfSliceOfSlice: invalid length", func(t *testing.T) {
+			r := validUser
+			r.SliceOfSliceOfSlice = [][][]string{
+				{
+					{
+						"value",
+					},
+				},
+				{
+					{},
+				},
+			}
+
+			err := r.Validate()
+			require.NotNil(t, err)
+			assert.Equal(t, `[SliceOfSliceOfSlice.1.0: less items than 1]`, err.Error())
 		})
 	})
 }
