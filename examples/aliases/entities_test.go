@@ -75,5 +75,24 @@ func Test_User_Validate(t *testing.T) {
 			require.NotNil(t, err)
 			assert.Equal(t, `[NonEmptyString: string is empty]`, err.Error())
 		})
+
+		t.Run("SomePointerNullable: valid", func(*testing.T) {
+			r := validUser
+			invalidString := StringType("aaaaaa")
+			r.SomePointerNullable = &invalidString
+
+			err := r.Validate()
+			require.NoError(t, err)
+		})
+
+		t.Run("SomePointerNullable: not valid", func(*testing.T) {
+			r := validUser
+			invalidString := StringType("a")
+			r.SomePointerNullable = &invalidString
+
+			err := r.Validate()
+			require.NotNil(t, err)
+			assert.Equal(t, `[SomePointerNullable: shorter than 3 chars]`, err.Error())
+		})
 	})
 }

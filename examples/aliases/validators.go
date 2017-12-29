@@ -93,5 +93,10 @@ func (r User) Validate() error {
 			errs.AddFieldf("SomePointer", "longer than 150 chars")
 		}
 	}
+	if r.SomePointerNullable != nil {
+		if err := r.SomePointerNullable.Validate(); err != nil {
+			errs.AddField("SomePointerNullable", err)
+		}
+	}
 	return errs.ErrorOrNil()
 }
