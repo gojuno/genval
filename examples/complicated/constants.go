@@ -25,5 +25,5 @@ func (s State) Validate() error { //overriding
 	if s > StateOk && s < StateError {
 		return nil
 	}
-	return fmt.Errorf("unrecognized state: %s", s)
+	return fmt.Errorf("unrecognized state: %v", s)
 }

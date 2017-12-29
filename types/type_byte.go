@@ -22,6 +22,10 @@ func (t *typeByte) SetValidateTag(tag ValidatableTag) error {
 	return ErrUnusedTag
 }
 
+func (t typeByte) NeedGenerate() bool {
+	return false
+}
+
 func (t typeByte) Generate(w io.Writer, cfg GenConfig, name Name) {
 
 }

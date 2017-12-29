@@ -30,6 +30,10 @@ func (t *typeInterface) SetValidateTag(tag ValidatableTag) error {
 	return nil
 }
 
+func (t typeInterface) NeedGenerate() bool {
+	return len(t.funcs) > 0
+}
+
 func (t typeInterface) Generate(w io.Writer, cfg GenConfig, name Name) {
 	for _, f := range t.funcs {
 		fmt.Fprintf(w, "if err := %s(%s); err != nil {\n", f, name.Full())

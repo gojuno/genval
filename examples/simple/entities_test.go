@@ -77,7 +77,7 @@ func Test_User_Validate(t *testing.T) {
 
 			err := user.Validate()
 			require.NotNil(t, err)
-			assert.Equal(t, "[Emails.1111: more than 3, Emails.1111: shorter than 5 chars]", err.Error())
+			assert.Equal(t, "[Emails.key[1111]: more than 3, Emails.1111: shorter than 5 chars]", err.Error())
 		})
 
 		t.Run("too young", func(t *testing.T) {

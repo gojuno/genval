@@ -35,6 +35,10 @@ func (t *typeString) SetValidateTag(tag ValidatableTag) error {
 	return nil
 }
 
+func (t typeString) NeedGenerate() bool {
+	return validMaxMin(t.maxLen, t.minLen)
+}
+
 func (t typeString) Generate(w io.Writer, cfg GenConfig, name Name) {
 	if t.minLen != nil {
 		if *t.minLen != "0" {

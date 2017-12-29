@@ -51,6 +51,10 @@ func (t *typeMap) SetValidateTag(tag ValidatableTag) error {
 	return nil
 }
 
+func (t typeMap) NeedGenerate() bool {
+	return t.key.NeedGenerate() || t.value.NeedGenerate() || validMaxMin(t.max, t.min)
+}
+
 func (t typeMap) Generate(w io.Writer, cfg GenConfig, name Name) {
 	if t.min != nil {
 		if *t.min != "0" {
@@ -65,15 +69,19 @@ func (t typeMap) Generate(w io.Writer, cfg GenConfig, name Name) {
 		fmt.Fprintf(w, "}\n")
 	}
 
-	if needGenerate(&t) {
-		keyVarName := genName(name.fieldName, true)
-		valVarName := genName(name.fieldName, false)
-		fmt.Fprintf(w, "for %s, %s := range %s {\n", keyVarName, valVarName, name.Full())
-		fmt.Fprintf(w, "	_ = %s \n", keyVarName)
-		fmt.Fprintf(w, "	_ = %s \n", valVarName)
+	if keyNeedGenerate, valueNeedGenerate := t.key.NeedGenerate(), t.value.NeedGenerate(); keyNeedGenerate || valueNeedGenerate {
+		kName, vName := "k"+name.fieldName, "_"
+		if valueNeedGenerate {
+			vName = "v" + name.fieldName
+		}
+		fmt.Fprintf(w, "for %s, %s := range %s {\n", kName, vName, name.Full())
 		cfg.AddImport("fmt")
-		t.key.Generate(w, cfg, NewIndexedName(name.LabelName(), keyVarName, keyVarName, name.tagName, true))
-		t.value.Generate(w, cfg, NewIndexedName(name.LabelName(), keyVarName, valVarName, name.tagName, true))
+		if keyNeedGenerate {
+			t.key.Generate(w, cfg, NewIndexedKeyName(name.labelName, kName, kName, name.tagName))
+		}
+		if valueNeedGenerate {
+			t.value.Generate(w, cfg, NewIndexedValueName(name.labelName, kName, vName, name.tagName))
+		}
 		fmt.Fprintf(w, "}\n")
 	}
 }

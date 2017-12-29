@@ -22,6 +22,10 @@ func (t *typeBool) SetValidateTag(tag ValidatableTag) error {
 	return ErrUnusedTag
 }
 
+func (t typeBool) NeedGenerate() bool {
+	return false
+}
+
 func (t typeBool) Generate(w io.Writer, cfg GenConfig, name Name) {
 
 }

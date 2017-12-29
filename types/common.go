@@ -13,6 +13,7 @@ type TypeDef interface {
 	Type() string
 	SetValidateTag(ValidatableTag) error
 	Validate() error
+	NeedGenerate() bool
 	Generate(w io.Writer, cfg GenConfig, name Name)
 	Expr() ast.Expr
 }
@@ -68,21 +69,26 @@ func NewName(pointerPrefix, structVar, labelName, fieldName, tagName string) Nam
 	}
 }
 
-func NewIndexedName(labelName, indexVar, validateVar, tagName string, complexLabelName bool) Name {
-
-	labelNamePrepared := fmt.Sprintf("fmt.Sprintf(\"%s.%%v\", %v)", labelName, indexVar)
-	if complexLabelName {
-		labelNamePrepared = fmt.Sprintf("fmt.Sprintf(%s + \".%%v\", %v)", labelName, indexVar)
-	}
-
+func NewIndexedValueName(labelName, indexVar, validateVar, tagName string) Name {
 	return Name{
 		pointerPrefix: "",
 		structVar:     "",
 		fieldName:     validateVar,
-		labelName:     labelNamePrepared,
+		labelName:     fmt.Sprintf("fmt.Sprintf(%s + \".%%v\", %v)", labelName, indexVar),
 		tagName:       tagName,
 	}
 }
+
+func NewIndexedKeyName(labelName, indexVar, validateVar, tagName string) Name {
+	return Name{
+		pointerPrefix: "",
+		structVar:     "",
+		fieldName:     validateVar,
+		labelName:     fmt.Sprintf("fmt.Sprintf(%s + \".key[%%v]\", %v)", labelName, indexVar),
+		tagName:       tagName,
+	}
+}
+
 func NewSimpleNameWithAliasType(fieldName, aliasType string) Name {
 	return Name{
 		aliasType:     &aliasType,
@@ -142,31 +148,6 @@ func parseFuncsParam(p string) []string {
 		}
 	}
 	return res
-}
-
-func needGenerate(t TypeDef) bool {
-	switch tpe := t.(type) {
-	case *typeByte:
-		return false
-	case *typeBool:
-		return false
-	case *typeNumber:
-		if validMaxMin(tpe.max, tpe.min) {
-			return true
-		}
-		return false
-	case *typeString:
-		if validMaxMin(tpe.maxLen, tpe.minLen) {
-			return true
-		}
-		return false
-	case *typeArray:
-		return needGenerate(tpe.innerType) || validMaxMin(tpe.max, tpe.min)
-	case *typeMap:
-		return needGenerate(tpe.key) || needGenerate(tpe.value)
-	default:
-		return true
-	}
 }
 
 func validMaxMin(max, min *string) bool {
