@@ -50,7 +50,7 @@ func Test_List_Add(t *testing.T) {
 		errs1.AddField("1", errors.New("a"))
 		errs1.Add(errors.New("b"))
 
-		assert.Equal(t, `[1: a, unknown: b]`, errs1.Error())
+		assert.Equal(t, `[1: a, b]`, errs1.Error())
 	})
 
 	t.Run("many errors", func(t *testing.T) {
