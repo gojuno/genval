@@ -6,8 +6,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-const UnknownField = "unknown"
-
 type Field struct {
 	Field string `json:"field"`
 	Err   error  `json:"err"`
