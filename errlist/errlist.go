@@ -58,7 +58,9 @@ func (e *List) AddField(field string, err error) *List {
 				*e = append(*e, err)
 			}
 		}
-	case error:
+	case Field:
+		*e = append(*e, errors.Errorf("%s.%v", field, v.Error()))
+	default:
 		*e = append(*e, Field{Field: field, Err: err})
 	}
 

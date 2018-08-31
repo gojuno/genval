@@ -64,7 +64,7 @@ func Test_User_Validate(t *testing.T) {
 
 			err := r.Validate()
 			require.NotNil(t, err)
-			assert.Equal(t, `[SomePointer: shorter than 20 chars]`, err.Error())
+			assert.Equal(t, `SomePointer: shorter than 20 chars`, err.Error())
 		})
 
 		t.Run("non_empty_string: using func validator", func(t *testing.T) {
@@ -73,7 +73,7 @@ func Test_User_Validate(t *testing.T) {
 
 			err := r.Validate()
 			require.NotNil(t, err)
-			assert.Equal(t, `[NonEmptyString: string is empty]`, err.Error())
+			assert.Equal(t, `NonEmptyString: string is empty`, err.Error())
 		})
 
 		t.Run("SomePointerNullable: valid", func(*testing.T) {
@@ -92,7 +92,7 @@ func Test_User_Validate(t *testing.T) {
 
 			err := r.Validate()
 			require.NotNil(t, err)
-			assert.Equal(t, `[SomePointerNullable: shorter than 3 chars]`, err.Error())
+			assert.Equal(t, `SomePointerNullable: shorter than 3 chars`, err.Error())
 		})
 	})
 }

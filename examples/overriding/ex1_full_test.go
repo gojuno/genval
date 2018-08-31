@@ -44,7 +44,7 @@ func Test_Request1_Validate(t *testing.T) {
 
 			err := r.Age.Validate()
 			require.NotNil(t, err)
-			assert.Equal(t, `[Value: more than 64]`, err.Error())
+			assert.Equal(t, `Value: more than 64`, err.Error())
 		})
 
 		t.Run("check min.", func(t *testing.T) {
