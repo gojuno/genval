@@ -6,7 +6,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-type List []Field
+type List []error
 
 // Error implements `error` interface
 func (e List) Error() string {
@@ -31,7 +31,8 @@ func (e *List) Add(err error) *List {
 
 	list, ok := err.(List)
 	if !ok {
-		return e.AddField(UnknownField, err)
+		*e = append(*e, err)
+		return e
 	}
 	for _, fe := range list {
 		*e = append(*e, fe)
@@ -48,10 +49,14 @@ func (e *List) AddField(field string, err error) *List {
 		return e
 	}
 
-	switch errTyped := err.(type) {
+	switch v := err.(type) {
 	case List:
-		for _, childErr := range errTyped {
-			*e = append(*e, Field{Field: field + "." + childErr.Field, Err: childErr.Err})
+		for _, err := range v {
+			if fieldErr, ok := err.(Field); ok {
+				*e = append(*e, Field{Field: field + "." + fieldErr.Field, Err: fieldErr.Err})
+			} else {
+				*e = append(*e, err)
+			}
 		}
 	case error:
 		*e = append(*e, Field{Field: field, Err: err})
@@ -60,13 +65,14 @@ func (e *List) AddField(field string, err error) *List {
 	return e
 }
 
-func (e List) HasErrors() bool {
-	return len(e) > 0
-}
-
 func (e List) ErrorOrNil() error {
-	if e.HasErrors() {
-		return e
+	if len(e) == 0 {
+		return nil
 	}
-	return nil
+
+	if len(e) == 1 {
+		return e[0]
+	}
+
+	return e
 }
