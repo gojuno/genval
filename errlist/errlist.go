@@ -73,6 +73,9 @@ func (e List) ErrorOrNil() error {
 	}
 
 	if len(e) == 1 {
+		if _, ok := e[0].(Field); ok {
+			return e
+		}
 		return e[0]
 	}
 
