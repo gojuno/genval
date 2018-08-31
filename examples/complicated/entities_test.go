@@ -70,7 +70,7 @@ func Test_Request1_Validate(t *testing.T) {
 
 			err := r.Validate()
 			require.NotNil(t, err)
-			assert.Equal(t, `Name: shorter than 3 chars`, err.Error())
+			assert.Equal(t, `[Name: shorter than 3 chars]`, err.Error())
 		})
 
 		t.Run("last_name: too short", func(t *testing.T) {
@@ -80,7 +80,7 @@ func Test_Request1_Validate(t *testing.T) {
 
 			err := r.Validate()
 			require.NotNil(t, err)
-			assert.Equal(t, `LastName: shorter than 1 chars`, err.Error())
+			assert.Equal(t, `[LastName: shorter than 1 chars]`, err.Error())
 		})
 
 		t.Run("last_name: empty", func(t *testing.T) {
@@ -97,7 +97,7 @@ func Test_Request1_Validate(t *testing.T) {
 
 			err := r.Validate()
 			require.NotNil(t, err)
-			assert.Equal(t, `Age: less than 18`, err.Error())
+			assert.Equal(t, `[Age: less than 18]`, err.Error())
 		})
 
 		t.Run("children_count: not_null rule", func(t *testing.T) {
@@ -106,7 +106,7 @@ func Test_Request1_Validate(t *testing.T) {
 
 			err := r.Validate()
 			require.NotNil(t, err)
-			assert.Equal(t, `ChildrenCount: cannot be nil`, err.Error())
+			assert.Equal(t, `[ChildrenCount: cannot be nil]`, err.Error())
 		})
 
 		t.Run("children_count: too much", func(t *testing.T) {
@@ -116,7 +116,7 @@ func Test_Request1_Validate(t *testing.T) {
 
 			err := r.Validate()
 			require.NotNil(t, err)
-			assert.Equal(t, `ChildrenCount: more than 15`, err.Error())
+			assert.Equal(t, `[ChildrenCount: more than 15]`, err.Error())
 		})
 
 		t.Run("dog_pointer: nil is ok", func(t *testing.T) {
@@ -133,7 +133,7 @@ func Test_Request1_Validate(t *testing.T) {
 
 			err := r.Validate()
 			require.NotNil(t, err)
-			assert.Equal(t, `DogPointer.Name: shorter than 1 chars`, err.Error())
+			assert.Equal(t, `[DogPointer.Name: shorter than 1 chars]`, err.Error())
 		})
 
 		t.Run("alias: alias type validator", func(t *testing.T) {
@@ -162,7 +162,7 @@ func Test_Request1_Validate(t *testing.T) {
 
 			err := r.Validate()
 			require.NotNil(t, err)
-			assert.Equal(t, `MapOfMap.key.1: shorter than 3 chars`, err.Error())
+			assert.Equal(t, `[MapOfMap.key.1: shorter than 3 chars]`, err.Error())
 		})
 
 		t.Run("SliceOfMap: invalid key", func(t *testing.T) {
@@ -175,7 +175,7 @@ func Test_Request1_Validate(t *testing.T) {
 
 			err := r.Validate()
 			require.NotNil(t, err)
-			assert.Equal(t, `SliceOfMap.0.key[k]: shorter than 3 chars`, err.Error())
+			assert.Equal(t, `[SliceOfMap.0.key[k]: shorter than 3 chars]`, err.Error())
 		})
 
 		t.Run("SliceOfSliceOfSlice: invalid length", func(t *testing.T) {
@@ -193,7 +193,7 @@ func Test_Request1_Validate(t *testing.T) {
 
 			err := r.Validate()
 			require.NotNil(t, err)
-			assert.Equal(t, `SliceOfSliceOfSlice.1.0: less items than 1`, err.Error())
+			assert.Equal(t, `[SliceOfSliceOfSlice.1.0: less items than 1]`, err.Error())
 		})
 	})
 }

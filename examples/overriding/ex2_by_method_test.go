@@ -26,7 +26,7 @@ func Test_Request2_Validate(t *testing.T) {
 
 			err := r.Validate()
 			require.NotNil(t, err)
-			assert.Equal(t, `Age: field Age is less than 10`, err.Error())
+			assert.Equal(t, `[Age: field Age is less than 10]`, err.Error())
 		})
 
 		t.Run("too young, using generated type validator", func(t *testing.T) {
@@ -61,7 +61,7 @@ func Test_Request2_Validate(t *testing.T) {
 
 			err := r.Validate()
 			require.NotNil(t, err)
-			assert.Equal(t, `Age: field Age is more than 64`, err.Error())
+			assert.Equal(t, `[Age: field Age is more than 64]`, err.Error())
 		})
 
 		t.Run("check min.", func(t *testing.T) {
@@ -70,7 +70,7 @@ func Test_Request2_Validate(t *testing.T) {
 
 			err := r.Validate()
 			require.NotNil(t, err)
-			assert.Equal(t, `Some: less than 3`, err.Error())
+			assert.Equal(t, `[Some: less than 3]`, err.Error())
 		})
 
 		t.Run("check max.", func(t *testing.T) {
@@ -79,7 +79,7 @@ func Test_Request2_Validate(t *testing.T) {
 
 			err := r.Validate()
 			require.NotNil(t, err)
-			assert.Equal(t, `Some: more than 64`, err.Error())
+			assert.Equal(t, `[Some: more than 64]`, err.Error())
 		})
 
 	})
