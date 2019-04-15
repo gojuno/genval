@@ -1,16 +1,16 @@
 language: go
 
-go:
-  - 1.10.x
-  - 1.11.x
+matrix:
+  include:
+    - go: 1.10.x
+      install:
+        - go get github.com/pkg/errors
+        - go get github.com/stretchr/testify/assert
+        - go get github.com/stretchr/testify/require
+    - go: 1.11.x
 
 env:
   - GO111MODULE=on
 
 script:
   - go test  ./...
-
-install:
-  - go get github.com/pkg/errors
-  - go get github.com/stretchr/testify/assert
-  - go get github.com/stretchr/testify/require
