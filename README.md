@@ -16,29 +16,29 @@ Usage
 
 ```go
 type User struct {
-    Name    string  `validate:"max_len=64"`
-    Age     uint    `validate:"min=18"`
-    Emails []string `validate:"min_items=1,item=[min_len=5]"`
+	Name   string   `validate:"max_len=64"`
+	Age    uint     `validate:"min=18"`
+	Emails []string `validate:"min_items=1,item=[min_len=5]"`
 }
 
 //generates:
 func (r User) Validate() error {
-    if utf8.RuneCountInString(r.Name) > 64 {
-        return fmt.Errorf("field Name is longer than 64 chars")
-    }
-    if r.Age < 18 {
-        return fmt.Errorf("field Age is shorter than 18 chars")
-    }
-    if len(r.Emails) < 1 {
-        return fmt.Errorf("array Emails has less items than 1 ")
-    }
-    for _, x := range r.Emails {
-        _ = x
-        if utf8.RuneCountInString(x) < 5 {
-            return fmt.Errorf("field x is shorter than 5 chars")
-        }
-    }
-    return nil
+	var errs errlist.List
+	if utf8.RuneCountInString(string(r.Name)) > 64 {
+		errs.AddFieldf("Name", "longer than 64 chars")
+	}
+	if r.Age < 18 {
+		errs.AddFieldf("Age", "less than 18")
+	}
+	if len(r.Emails) < 1 {
+		errs.AddFieldf("Emails", "less items than 1")
+	}
+	for kEmails, vEmails := range r.Emails {
+		if utf8.RuneCountInString(string(vEmails)) < 5 {
+			errs.AddFieldf(fmt.Sprintf("Emails"+".%v", kEmails), "shorter than 5 chars")
+		}
+	}
+	return errs.ErrorOrNil()
 }
 ```
 
@@ -76,19 +76,19 @@ Go doesn`t support enums, but you can create some custom type and add few consta
 type State int
 
 const (
-    StateOk    State = 200
-    StateError State = 400
+	StateOk    State = 200
+	StateError State = 400
 )
 
 //generates:
 func (r State) Validate() error {
-    switch r {
-    case StateOk:
-    case StateError:
-    default:
-        return fmt.Errorf("invalid value for enum State: %v", r)
-    }
-    return nil
+	switch r {
+	case StateOk:
+	case StateError:
+	default:
+		return fmt.Errorf("invalid value for enum State: %v", r)
+	}
+	return nil
 }
 ```
 
@@ -102,30 +102,30 @@ func (r State) Validate() error {
 In some cases it\`s required to add some custom validation. You can just add unexported `validate` method.
 ```go
 type User struct {
-    Name  string `validate:"max_len=64"`
-    Age   uint   `validate:"min=16"`
-    Email string
+	Name  string `validate:"max_len=64"`
+	Age   uint   `validate:"min=16"`
+	Email string
 }
 
 func (u User) validate() error {
-    if u.Age < 18 && u.Email == "" {
-        return errors.New("email is required for people younger than 18")
-    }
-
-    return nil
+	if u.Age < 18 && u.Email == "" {
+		return errors.New("email is required for people younger than 18")
+	}
+	return nil
 }
 
 // generates:
 func (r User) Validate() error {
-	if utf8.RuneCountInString(r.Name) > 64 {
-		return fmt.Errorf("field Name is longer than 64 chars")
+	var errs errlist.List
+	if utf8.RuneCountInString(string(r.Name)) > 64 {
+		errs.AddFieldf("Name", "longer than 64 chars")
 	}
 	if r.Age < 16 {
-		return fmt.Errorf("field Age is less than 16 ")
+		errs.AddFieldf("Age", "less than 16")
 	}
-
-	return r.validate() // custom validation call
+	errs.Add(r.validate())
+	return errs.ErrorOrNil()
 }
 ```
 #### Override validation
-If you don\`t want to use genval for some structs or use just custom validation then you can override exported `Validate` method. In this case genval will generate nothing for this struct.
+If you don\`t want to use genval for some structs or use just custom validation then you can **override exported `Validate`** method. In this case genval **will generate nothing** for this struct.
